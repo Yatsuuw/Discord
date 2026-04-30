@@ -1,7 +1,19 @@
+import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "../generated/prisma/index.js";
 import { logger } from "./logger.js";
 
-export const db = new PrismaClient({} as ConstructorParameters<typeof PrismaClient>[0]);
+const dbUrl = new URL(process.env.DATABASE_URL!);
+
+const adapter = new PrismaMariaDb({
+  host: dbUrl.hostname,
+  port: Number(dbUrl.port),
+  user: dbUrl.username,
+  password: dbUrl.password,
+  database: dbUrl.pathname.replace("/", ""),
+  connectionLimit: 5,
+});
+
+export const db = new PrismaClient({ adapter });
 
 export async function connectDB(): Promise<void> {
   try {
