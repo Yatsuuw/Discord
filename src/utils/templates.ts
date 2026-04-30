@@ -36,5 +36,13 @@ export const Templates = {
       .setTitle(title)
       .addFields(fields)
       .setTimestamp();
-  }
+  },
+
+  error: (content: string) => {
+    return new EmbedBuilder()
+      .setColor(Colors.Red)
+      .setTitle('❌ Erreur')
+      .setDescription(content)
+      .setTimestamp();
+  },
 };
