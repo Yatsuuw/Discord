@@ -3,4 +3,5 @@ export declare const command: {
     data: import("discord.js").SlashCommandOptionsOnlyBuilder;
     execute(interaction: ChatInputCommandInteraction): Promise<import("discord.js").InteractionResponse<boolean>>;
 };
+export default command;
 //# sourceMappingURL=profil.d.ts.map

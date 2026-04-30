@@ -61,4 +61,5 @@ export const command = {
         return interaction.reply({ embeds: [embed] });
     }
 };
+export default command;
 //# sourceMappingURL=profil.js.map

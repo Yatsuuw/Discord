@@ -39,4 +39,5 @@ export const command = {
         }
     }
 };
+export default command;
 //# sourceMappingURL=init.js.map

@@ -42,4 +42,5 @@ export const command = {
         }
     }
 };
+export default command;
 //# sourceMappingURL=set-profil.js.map
