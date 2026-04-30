@@ -4,6 +4,7 @@ import { readdirSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { config } from '../config.js';
+import { logger } from '../utils/logger.js';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -32,11 +33,18 @@ export class ExtendedClient extends Client {
 
       for (const file of commandFiles) {
         const filePath = pathToFileURL(join(categoryPath, file)).href;
-        const command: Command = (await import(filePath)).default;
+        const module = await import(filePath);
+        const command: Command = module.default;
+
+        if (!command || !command.data || !command.execute) {
+          logger.warn(`⚠️ Fichier ignoré (export invalide) : ${file}`);
+          continue;
+        }
+
         this.commands.set(command.data.name, command);
       }
     }
-    console.log(`${this.commands.size} commandes chargées.`);
+    logger.info(`${this.commands.size} commandes chargées.`);
   }
 
   private async loadEvents() {
@@ -61,6 +69,6 @@ export class ExtendedClient extends Client {
       }
     }
 
-    console.log('Système des événements chargé par catégories.');
+    logger.info('Système des événements chargé par catégories.');
   }
 }
