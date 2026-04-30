@@ -1,5 +1,6 @@
-import { Events, type Interaction } from "discord.js";
+import { EmbedBuilder, Events, type Interaction, Colors } from "discord.js";
 import type { Event } from "../../types/index.js";
+import { logger } from "../../utils/logger.js";
 
 const event: Event<Events.InteractionCreate> = {
   name: Events.InteractionCreate,
@@ -19,13 +20,18 @@ const event: Event<Events.InteractionCreate> = {
     try {
       await command.execute(interaction, client);
     } catch (error) {
-      console.error(error);
-      const errorMessage = { content: 'Une erreur est survenue !', ephemeral: true };
+      logger.error(`Erreur lors de l'exécution de /${interaction.commandName}`, error);
+
+      const errorEmbed = new EmbedBuilder()
+        .setTitle('❌ Une erreur est survenue')
+        .setDescription('Une erreur interne empêche l\'exécution de cette commande.')
+        .setColor(Colors.Red)
+        .setFooter({ text: `ID de l'erreur : ${Date.now()}` });
 
       if (interaction.replied || interaction.deferred) {
-        await interaction.followUp(errorMessage);
+        await interaction.followUp({ embeds: [errorEmbed], ephemeral: true });
       } else {
-        await interaction.reply(errorMessage);
+        await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
       }
     }
   }

@@ -1,12 +1,14 @@
 import { PrismaClient } from "@prisma/client/extension";
+import { logger } from "./logger.js";
 
-export const db = new PrismaClient({
-  log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
-});
+export const db = new PrismaClient();
 
-try {
-  await db.$connect();
-  console.log('Connecté à MariaDB via Prisma.');
-} catch (error) {
-  console.error('Erreur de connexion MariaDB :', error);
+export async function connectDB() {
+  try {
+    await db.$connect();
+    logger.info('🐘 Connecté à MariaDB avec succès.');
+  } catch (err) {
+    logger.error('❌ Impossible de se connecter à MariaDB :', err);
+    process.exit(1);
+  }
 }
