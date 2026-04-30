@@ -86,4 +86,4 @@ pnpm db:gen
 | pnpm lint:fix      | Essaie de corriger automatiquement les erreurs de formatage ou de style simples. |
 
 ## License
-Projet distribué sous la license Apache-2.0. Voir le fichier `LICENCE` pour plus d'informations.
+Projet distribué sous la licence GPL-3.0. Voir le fichier `LICENCE` pour plus d'informations.
