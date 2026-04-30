@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model anime_translates {
+  anime    String @db.VarChar(100)
+  language String @db.VarChar(2)
+
+  @@id([anime, language])
+}
+
+model manga_translates {
+  manga    String @db.VarChar(100)
+  language String @db.VarChar(2)
+
+  @@id([manga, language])
+}
+
+model servers {
+  id    String @db.VarChar(19)
+  owner String @db.VarChar(19)
+
+  @@id([id, owner])
+}
+
+model users {
+  user         String  @id @db.VarChar(19)
+  mal_username String? @db.VarChar(50)
+  al_username  String? @db.VarChar(50)
+  mangacollec  String? @db.VarChar(50)
+}

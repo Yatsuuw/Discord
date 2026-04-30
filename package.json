@@ -1,0 +1,39 @@
+{
+  "name": "nom",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch --env-file=.env src/index.ts",
+    "prebuild": "rm -rf dist",
+    "build": "tsc",
+    "start": "node --env-file=.env dist/index.js",
+    "deploy:local": "tsx --env-file=.env src/deploy.ts",
+    "deploy:global": "tsx --env-file=.env src/deploy.ts --global",
+    "lint": "eslint src/**/*.ts",
+    "lint:fix": "eslint src/**/*.ts --fix",
+    "db:pull": "node --env-file=.env ./node_modules/prisma/build/index.js db pull",
+    "db:gen": "node --env-file=.env ./node_modules/prisma/build/index.js generate"
+  },
+  "keywords": [],
+  "author": "yatsuu",
+  "license": "Apache-2.0",
+  "packageManager": "pnpm@10.33.2",
+  "dependencies": {
+    "@prisma/client": "^7.8.0",
+    "discord.js": "^14.26.3",
+    "dotenv": "^17.4.2"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.6.0",
+    "dotenv-cli": "^11.0.0",
+    "eslint": "^10.2.1",
+    "prettier": "^3.8.3",
+    "prisma": "^7.8.0",
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.59.1"
+  }
+}
