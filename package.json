@@ -1,7 +1,7 @@
 {
-  "name": "nom",
+  "name": "tsuyomi",
   "version": "1.0.0",
-  "description": "",
+  "description": "Sauvegarde des pages de profils d'utilisateurs de MyAnimeList et AniList. Fonctions de recherche d'animés et de mangas. Les profils et résultats de recherches seront affichés sur Discord, dans un serveur ou en privé.",
   "main": "dist/index.js",
   "type": "module",
   "scripts": {
@@ -18,7 +18,7 @@
   },
   "keywords": [],
   "author": "yatsuu",
-  "license": "Apache-2.0",
+  "license": "GPL-3.0-only",
   "packageManager": "pnpm@10.33.2",
   "dependencies": {
     "@prisma/client": "^7.8.0",
