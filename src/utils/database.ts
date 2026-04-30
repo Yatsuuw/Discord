@@ -1,4 +1,4 @@
-import { PrismaClient } from "../generated/prisma/client.js";
+import { PrismaClient } from "../generated/prisma/index.js";
 import { logger } from "./logger.js";
 
 export const db = new PrismaClient({} as ConstructorParameters<typeof PrismaClient>[0]);
