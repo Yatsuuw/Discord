@@ -1,9 +1,9 @@
-import { PrismaClient } from "@prisma/client/extension";
+import { PrismaClient } from "../generated/prisma/client.js";
 import { logger } from "./logger.js";
 
-export const db = new PrismaClient();
+export const db = new PrismaClient({} as ConstructorParameters<typeof PrismaClient>[0]);
 
-export async function connectDB() {
+export async function connectDB(): Promise<void> {
   try {
     await db.$connect();
     logger.info('🐘 Connecté au serveur MariaDB avec succès.');

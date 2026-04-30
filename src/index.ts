@@ -1,6 +1,7 @@
 import { GatewayIntentBits } from 'discord.js';
 import { ExtendedClient } from './structures/ExtendedClient.js';
 import { logger } from './utils/logger.js';
+import { connectDB } from './utils/database.js';
 
 const client = new ExtendedClient({
   intents: [
@@ -11,6 +12,7 @@ const client = new ExtendedClient({
 });
 
 (async () => {
+  await connectDB();
   await client.start();
 })();
 
