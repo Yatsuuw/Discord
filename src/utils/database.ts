@@ -6,9 +6,9 @@ export const db = new PrismaClient();
 export async function connectDB() {
   try {
     await db.$connect();
-    logger.info('🐘 Connecté à MariaDB avec succès.');
+    logger.info('🐘 Connecté au serveur MariaDB avec succès.');
   } catch (err) {
-    logger.error('❌ Impossible de se connecter à MariaDB :', err);
+    logger.error('❌ Impossible de se connecter au serveur MariaDB :', err);
     process.exit(1);
   }
 }
