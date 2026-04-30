@@ -1,11 +1,12 @@
 import { Events } from "discord.js";
 import type { Event } from "../../types/index.js";
+import { logger } from "../../utils/logger.js";
 
 const event: Event<Events.ClientReady> = {
   name: Events.ClientReady,
   once: true,
   execute(_client, c) {
-    console.log(`${c.user.tag} est connecté.`);
+    logger.info(`${c.user.tag} est connecté.`);
   }
 };
 
