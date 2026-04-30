@@ -80,3 +80,5 @@ export const command = {
       return interaction.reply({ embeds: [embed] });
     }
 };
+
+export default command;
