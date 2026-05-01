@@ -30,7 +30,7 @@ function writeToFile(level: string, message: string, error?: unknown): void {
 
 export const logger = {
   info: (message: string) => {
-    const time = new Date().toLocaleDateString();
+    const time = new Date().toLocaleTimeString();
     console.log(`${Colors.Green}[INFO]${Colors.Reset} [${time}] ${message}`);
     writeToFile('INFO', message);
   },
