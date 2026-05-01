@@ -10,8 +10,11 @@ export const DataManager = {
             throw error;
         }
     },
-    async upsertUser(userId, mal, al, mc) {
+    async upsertUser(userId, profiles) {
         try {
+            const mal = profiles.mal ?? null;
+            const al = profiles.al ?? null;
+            const mc = profiles.mc ?? null;
             return await db.users.upsert({
                 where: { user: userId },
                 update: { mal_username: mal, al_username: al, mangacollec: mc },
@@ -37,9 +40,15 @@ export const DataManager = {
         }
     },
     async getServer(guildId, ownerId) {
-        return await db.servers.findUnique({
-            where: { id_owner: { id: guildId, owner: ownerId } },
-        });
+        try {
+            return await db.servers.findUnique({
+                where: { id_owner: { id: guildId, owner: ownerId } },
+            });
+        }
+        catch (error) {
+            logger.error(`Erreir de lecture du serveur ${guildId} :`, error);
+            throw error;
+        }
     },
 };
 //# sourceMappingURL=dataManager.js.map

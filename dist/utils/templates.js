@@ -31,9 +31,11 @@ export const Templates = {
             .setFooter({ text: 'Action requise' });
         const buttons = new ActionRowBuilder().addComponents(new ButtonBuilder()
             .setCustomId('confirm')
+            .setEmoji('✅')
             .setLabel('Confirmer')
             .setStyle(ButtonStyle.Success), new ButtonBuilder()
             .setCustomId('cancel')
+            .setEmoji('❌')
             .setLabel('Annuler')
             .setStyle(ButtonStyle.Danger));
         return { embeds: [embed], components: [buttons] };

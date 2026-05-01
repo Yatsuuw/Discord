@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder, } from 'discord.js';
-import { searchAniList, buildResultEmbed, buildNoResultEmbed, PER_PAGE, } from '../../utils/anilist.graphql_api.js';
+import { searchAniList, buildResultEmbed, buildNoResultEmbed, } from '../../utils/anilist.graphql_api.js';
 import { Templates } from '../../utils/templates.js';
 import { logger } from '../../utils/logger.js';
 const COLLECTOR_TIMEOUT = 120_000;
@@ -33,9 +33,6 @@ function buildActionRow() {
         .setLabel('Supprimer')
         .setStyle(ButtonStyle.Danger));
 }
-function buildDisabledNavRow() {
-    return buildNavRow(true, true);
-}
 const command = {
     data: new SlashCommandBuilder()
         .setName('search')
@@ -55,7 +52,7 @@ const command = {
         const type = interaction.options.getString('type', true);
         const search = interaction.options.getString('nom', true).trim();
         await interaction.deferReply();
-        let pageData = await searchAniList(search, type, 1).catch((err) => {
+        const pageData = await searchAniList(search, type).catch((err) => {
             logger.error(`Erreur AniList /search "${search}" :`, err);
             return null;
         });
@@ -69,29 +66,14 @@ const command = {
             await interaction.editReply({ embeds: [buildNoResultEmbed(search, type)] });
             return;
         }
+        const results = pageData.results;
         const total = pageData.total;
-        const totalPages = Math.max(1, Math.ceil(total / PER_PAGE));
-        let currentPage = 1;
-        let currentIndex = 0;
-        function globalPosition() {
-            return (currentPage - 1) * PER_PAGE + currentIndex + 1;
-        }
-        function isFirst() {
-            return currentPage === 1 && currentIndex === 0;
-        }
-        function isLast() {
-            return !pageData.hasNext && currentIndex === pageData.results.length - 1;
-        }
-        const cache = new Map([[1, pageData]]);
-        async function getPage(page) {
-            if (cache.has(page))
-                return cache.get(page);
-            const data = await searchAniList(search, type, page);
-            cache.set(page, data);
-            return data;
-        }
+        let index = 0;
+        const isFirst = () => index === 0;
+        const isLast = () => index === results.length - 1;
+        const position = () => index + 1;
         const message = await interaction.editReply({
-            embeds: [buildResultEmbed(pageData.results[0], globalPosition(), total)],
+            embeds: [buildResultEmbed(results[0], position(), total)],
             components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
         });
         const collector = message.createMessageComponentCollector({
@@ -113,53 +95,33 @@ const command = {
                     return;
                 }
                 switch (btn.customId) {
-                    case 'next': {
-                        if (currentIndex < pageData.results.length - 1) {
-                            currentIndex++;
-                        }
-                        else if (pageData.hasNext) {
-                            currentPage++;
-                            pageData = await getPage(currentPage);
-                            currentIndex = 0;
-                        }
+                    case 'next':
+                        if (!isLast())
+                            index++;
                         break;
-                    }
-                    case 'prev': {
-                        if (currentIndex > 0) {
-                            currentIndex--;
-                        }
-                        else if (currentPage > 1) {
-                            currentPage--;
-                            pageData = await getPage(currentPage);
-                            currentIndex = pageData.results.length - 1;
-                        }
+                    case 'prev':
+                        if (!isFirst())
+                            index--;
                         break;
-                    }
-                    case 'first': {
-                        currentPage = 1;
-                        currentIndex = 0;
-                        pageData = await getPage(1);
+                    case 'first':
+                        index = 0;
                         break;
-                    }
-                    case 'last': {
-                        currentPage = totalPages;
-                        pageData = await getPage(totalPages);
-                        currentIndex = pageData.results.length - 1;
+                    case 'last':
+                        index = results.length - 1;
                         break;
-                    }
                 }
-                const media = pageData.results[currentIndex];
+                const media = results[index];
                 if (!media)
                     return;
                 await btn.editReply({
-                    embeds: [buildResultEmbed(media, globalPosition(), total)],
+                    embeds: [buildResultEmbed(media, position(), total)],
                     components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
                 });
             }
             catch (err) {
                 logger.error('Erreur navigation /search :', err);
                 await btn.editReply({
-                    embeds: [Templates.error('Une erreur est survenue lors du chargement de ce résultat.')],
+                    embeds: [Templates.error('Une erreur est survenue lors de la navigation.')],
                     components: [],
                 });
             }
@@ -167,9 +129,7 @@ const command = {
         collector.on('end', async (_, reason) => {
             if (reason === 'confirmed' || reason === 'deleted')
                 return;
-            await interaction.editReply({
-                components: [buildDisabledNavRow()],
-            }).catch(() => { });
+            await interaction.editReply({ components: [buildNavRow(true, true)] }).catch(() => { });
         });
     },
 };

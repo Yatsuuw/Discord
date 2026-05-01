@@ -20,10 +20,15 @@ const FORMAT_LABELS = {
     NOVEL: 'Light Novel',
     ONE_SHOT: 'One-shot',
 };
+const MONTHS_FR = [
+    'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+    'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
+];
+// La query n'a plus besoin du paramètre $page — toujours page 1
 const SEARCH_QUERY = `
-  query ($search: String, $type: MediaType, $page: Int, $perPage: Int) {
-    Page(page: $page, perPage: $perPage) {
-      pageInfo { total hasNextPage }
+  query ($search: String, $type: MediaType, $perPage: Int) {
+    Page(page: 1, perPage: $perPage) {
+      pageInfo { total }
       media(search: $search, type: $type, sort: SEARCH_MATCH) {
         id
         title { romaji english native }
@@ -52,16 +57,13 @@ const SEARCH_QUERY = `
     }
   }
 `;
-export async function searchAniList(search, type, page = 1) {
-    if (page > 1) {
-        return { results: [], total: 0, hasNext: false, hasPrev: false };
-    }
+export async function searchAniList(search, type) {
     const response = await fetch(ANILIST_API, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
         body: JSON.stringify({
             query: SEARCH_QUERY,
-            variables: { search, type, page: 1, perPage: PER_PAGE },
+            variables: { search, type, perPage: PER_PAGE },
         }),
     });
     if (!response.ok) {
@@ -71,38 +73,38 @@ export async function searchAniList(search, type, page = 1) {
     if (json.errors?.length) {
         throw new Error(`AniList GraphQL error : ${json.errors[0].message}`);
     }
-    const { media } = json.data.Page;
-    const capped = media.slice(0, PER_PAGE);
+    const results = json.data.Page.media.slice(0, PER_PAGE);
     return {
-        results: media,
-        total: capped.length,
-        hasNext: false,
-        hasPrev: false,
+        results,
+        total: results.length,
     };
+}
+// ── Helpers privés ────────────────────────────────────────────────────────────
+const RE_HTML = /<[^>]*>/g;
+const RE_NEWLINE = /\n{3,}/g;
+function stripHtml(text) {
+    return text.replace(RE_HTML, '').replace(RE_NEWLINE, '\n\n').trim();
+}
+function truncate(text, max) {
+    return text.length <= max ? text : text.slice(0, max - 1) + '…';
+}
+function parseColor(hex) {
+    if (!hex)
+        return Colors.Blurple;
+    const parsed = parseInt(hex.replace('#', ''), 16);
+    return isNaN(parsed) ? Colors.Blurple : parsed;
 }
 function formatDate(date) {
     if (!date.year)
         return 'Inconnue';
     if (!date.month)
         return `${date.year}`;
-    const d = new Date(date.year, date.month - 1, date.day ?? 1);
-    return d.toLocaleDateString('fr-FR', {
-        year: 'numeric',
-        month: 'long',
-        day: date.day ? 'numeric' : undefined,
-    });
+    const month = MONTHS_FR[date.month - 1];
+    return date.day ? `${date.day} ${month} ${date.year}` : `${month} ${date.year}`;
 }
-function stripHtml(text) {
-    return text.replace(/<[^>]*>/g, '').replace(/\n{3,}/g, '\n\n').trim();
-}
-function truncate(text, max) {
-    return text.length <= max ? text : text.slice(0, max - 1) + '…';
-}
-export function buildResultEmbed(media, globalIndex, total) {
+// ── Embeds publics ────────────────────────────────────────────────────────────
+export function buildResultEmbed(media, index, total) {
     const title = media.title.english ?? media.title.romaji;
-    const color = media.coverImage.color
-        ? parseInt(media.coverImage.color.replace('#', ''), 16)
-        : Colors.Blurple;
     const description = media.description
         ? truncate(stripHtml(media.description), 300)
         : '*Aucune description disponible.*';
@@ -132,11 +134,11 @@ export function buildResultEmbed(media, globalIndex, total) {
         if (media.episodes) {
             fields.push({ name: '🎬 Épisodes', value: String(media.episodes), inline: true });
         }
-        const animStudios = media.studios.nodes
+        const studios = media.studios.nodes
             .filter(s => s.isAnimationStudio)
             .map(s => s.name);
-        if (animStudios.length) {
-            fields.push({ name: '🏢 Studio(s)', value: animStudios.join(', '), inline: true });
+        if (studios.length) {
+            fields.push({ name: '🏢 Studio(s)', value: studios.join(', '), inline: true });
         }
     }
     if (media.type === 'MANGA') {
@@ -158,15 +160,13 @@ export function buildResultEmbed(media, globalIndex, total) {
         fields.push({ name: '🏷️ Genres', value: media.genres.slice(0, 5).join(', '), inline: false });
     }
     return new EmbedBuilder()
-        .setColor(color)
+        .setColor(parseColor(media.coverImage.color))
         .setTitle(truncate(title, 256))
         .setURL(media.siteUrl)
         .setDescription(description)
         .setThumbnail(media.coverImage.extraLarge)
         .addFields(fields)
-        .setFooter({
-        text: `Résultat ${globalIndex}/${total} · AniList`,
-    })
+        .setFooter({ text: `Résultat ${index}/${total} · AniList` })
         .setTimestamp();
 }
 export function buildNoResultEmbed(search, type) {

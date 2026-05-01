@@ -52,11 +52,9 @@ export interface AniListMedia {
 export interface AniListPage {
     results: AniListMedia[];
     total: number;
-    hasNext: boolean;
-    hasPrev: boolean;
 }
 export declare const PER_PAGE = 10;
-export declare function searchAniList(search: string, type: MediaType, page?: number): Promise<AniListPage>;
-export declare function buildResultEmbed(media: AniListMedia, globalIndex: number, total: number): EmbedBuilder;
+export declare function searchAniList(search: string, type: MediaType): Promise<AniListPage>;
+export declare function buildResultEmbed(media: AniListMedia, index: number, total: number): EmbedBuilder;
 export declare function buildNoResultEmbed(search: string, type: MediaType): EmbedBuilder;
 //# sourceMappingURL=anilist.graphql_api.d.ts.map

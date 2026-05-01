@@ -9,7 +9,7 @@ const event = {
         const command = client.commands.get(interaction.commandName);
         if (!command) {
             await interaction.reply({
-                content: 'Cette commande n\'existe pas.',
+                embeds: [Templates.error('Cette commande n\'existe pas ou a été désactivée.')],
                 flags: MessageFlags.Ephemeral
             });
             return;

@@ -19,11 +19,15 @@ function writeToFile(level, message, error) {
     let logMessage = `[${now.toLocaleTimeString()}] [${level}] ${message}\n`;
     if (error)
         logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
-    appendFile(join(logsDir, `${date}.log`), logMessage, 'utf8', () => { });
+    appendFile(join(logsDir, `${date}.log`), logMessage, 'utf8', (err) => {
+        if (err)
+            logger.error('Échec d\'écriture du fichier :', err);
+    });
 }
 export const logger = {
     info: (message) => {
-        console.log(`${Colors.Green}[INFO]${Colors.Reset} [${new Date().toLocaleTimeString()}] ${message}`);
+        const time = new Date().toLocaleDateString();
+        console.log(`${Colors.Green}[INFO]${Colors.Reset} [${time}] ${message}`);
         writeToFile('INFO', message);
     },
     warn: (message) => {

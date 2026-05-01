@@ -1,3 +1,8 @@
+interface UserProfiles {
+    mal?: string | null;
+    al?: string | null;
+    mc?: string | null;
+}
 export declare const DataManager: {
     getUser(userId: string): Promise<{
         user: string;
@@ -5,7 +10,7 @@ export declare const DataManager: {
         al_username: string | null;
         mangacollec: string | null;
     } | null>;
-    upsertUser(userId: string, mal: string | null, al: string | null, mc: string | null): Promise<{
+    upsertUser(userId: string, profiles: Partial<UserProfiles>): Promise<{
         user: string;
         mal_username: string | null;
         al_username: string | null;
@@ -20,4 +25,5 @@ export declare const DataManager: {
         owner: string;
     } | null>;
 };
+export {};
 //# sourceMappingURL=dataManager.d.ts.map

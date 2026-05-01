@@ -21,7 +21,7 @@ export const command = {
             const mal = site === 'mal' ? username : (current?.mal_username ?? null);
             const al = site === 'al' ? username : (current?.al_username ?? null);
             const mc = site === 'mc' ? username : (current?.mangacollec ?? null);
-            await DataManager.upsertUser(userId, mal, al, mc);
+            await DataManager.upsertUser(userId, { mal, al, mc });
             const siteName = site === 'mal' ? 'MyAnimeList' : site === 'al' ? 'AniList' : 'MangaCollec';
             const action = username === null ? 'supprimé' : 'enregistré';
             return interaction.reply({

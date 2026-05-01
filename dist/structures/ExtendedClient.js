@@ -20,51 +20,52 @@ export class ExtendedClient extends Client {
         catch (error) {
             logger.error(`Une erreur est survenue lors du démarrage du robot :`, error);
             await db.$disconnect();
-            await new Promise(resolve => setTimeout(resolve, 50));
             process.exit(1);
         }
     }
-    async loadCommands() {
-        const commandsPath = join(__dirname, '../commands');
-        const categories = readdirSync(commandsPath);
+    async loadModules(basePath) {
+        const modules = [];
+        const categories = readdirSync(basePath);
         for (const category of categories) {
-            const categoryPath = join(commandsPath, category);
+            const categoryPath = join(basePath, category);
             if (!statSync(categoryPath).isDirectory())
                 continue;
-            const commandFiles = readdirSync(categoryPath).filter(f => (f.endsWith('.js') || f.endsWith('.ts')) && !f.endsWith('.d.ts'));
-            for (const file of commandFiles) {
+            const files = readdirSync(categoryPath).filter(f => (f.endsWith('.js') || f.endsWith('.ts')) && !f.endsWith('.d.ts'));
+            for (const file of files) {
                 const filePath = pathToFileURL(join(categoryPath, file)).href;
-                const module = await import(filePath);
-                const command = module.default;
-                if (!command || !command.data || !command.execute) {
-                    logger.warn(`⚠️ Fichier ignoré (export invalide) : ${file}`);
-                    continue;
-                }
-                this.commands.set(command.data.name, command);
+                const mod = (await import(filePath)).default;
+                if (mod)
+                    modules.push(mod);
             }
+        }
+        return modules;
+    }
+    async loadCommands() {
+        const commands = await this.loadModules(join(__dirname, '../commands'));
+        for (const command of commands) {
+            if (!command.data || !command.execute) {
+                logger.warn(`⚠️ Commande ignorée (export invalide)`);
+                continue;
+            }
+            this.commands.set(command.data.name, command);
         }
         logger.info(`${this.commands.size} commandes chargées.`);
     }
     async loadEvents() {
-        const eventsPath = join(__dirname, '../events');
-        const categories = readdirSync(eventsPath);
-        for (const category of categories) {
-            const categoryPath = join(eventsPath, category);
-            if (!statSync(categoryPath).isDirectory())
+        const events = await this.loadModules(join(__dirname, '../events'));
+        for (const event of events) {
+            if (!event.name || !event.execute) {
+                logger.warn(`⚠️ Événement ignoré (export invalide)`);
                 continue;
-            const eventFiles = readdirSync(categoryPath).filter(f => (f.endsWith('.js') || f.endsWith('.ts')) && !f.endsWith('.d.ts'));
-            for (const file of eventFiles) {
-                const filePath = pathToFileURL(join(categoryPath, file)).href;
-                const event = (await import(filePath)).default;
-                if (event.once) {
-                    this.once(event.name, (...args) => event.execute(this, ...args));
-                }
-                else {
-                    this.on(event.name, (...args) => event.execute(this, ...args));
-                }
+            }
+            if (event.once) {
+                this.once(event.name, (...args) => event.execute(this, ...args));
+            }
+            else {
+                this.on(event.name, (...args) => event.execute(this, ...args));
             }
         }
-        logger.info('Système des événements chargé par catégories.');
+        logger.info('Système des événements chargé.');
     }
 }
 //# sourceMappingURL=ExtendedClient.js.map
