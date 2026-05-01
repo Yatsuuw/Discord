@@ -1,5 +1,10 @@
 import { EmbedBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 
+const REQUEST_ROW = new ActionRowBuilder<ButtonBuilder>().addComponents(
+  new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Confirmer').setStyle(ButtonStyle.Success),
+  new ButtonBuilder().setCustomId('cancel').setEmoji('❌').setLabel('Annuler').setStyle(ButtonStyle.Danger),
+);
+
 export const Templates = {
   success: (content: string) =>
     new EmbedBuilder()
@@ -39,19 +44,6 @@ export const Templates = {
       .setDescription(description)
       .setFooter({ text: 'Action requise' });
 
-    const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
-      new ButtonBuilder()
-        .setCustomId('confirm')
-        .setEmoji('✅')
-        .setLabel('Confirmer')
-        .setStyle(ButtonStyle.Success),
-      new ButtonBuilder()
-        .setCustomId('cancel')
-        .setEmoji('❌')
-        .setLabel('Annuler')
-        .setStyle(ButtonStyle.Danger)
-    );
-
-    return { embeds: [embed], components: [buttons] };
+    return { embeds: [embed], components: [REQUEST_ROW] };
   },
 };
