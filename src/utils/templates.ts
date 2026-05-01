@@ -35,6 +35,7 @@ export const Templates = {
       .setColor(Colors.Blurple)
       .setTitle(title)
       .addFields(fields)
+      .setFooter({ text: 'Tsuyomi' })
       .setTimestamp(),
 
   request: (title: string, description: string) => {
