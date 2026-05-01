@@ -1,5 +1,5 @@
 import { ChatInputCommandInteraction, type ClientEvents, type RESTPostAPIApplicationCommandsJSONBody } from 'discord.js';
-import { ExtendedClient } from '../structures/ExtendedClient.js';
+import type { ExtendedClient } from '../structures/ExtendedClient.js';
 export interface Command {
     data: {
         toJSON(): RESTPostAPIApplicationCommandsJSONBody;

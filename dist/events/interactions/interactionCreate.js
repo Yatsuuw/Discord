@@ -1,5 +1,6 @@
-import { EmbedBuilder, Events, Colors, MessageFlags } from "discord.js";
+import { Events, MessageFlags } from "discord.js";
 import { logger } from "../../utils/logger.js";
+import { Templates } from "../../utils/templates.js";
 const event = {
     name: Events.InteractionCreate,
     async execute(client, interaction) {
@@ -18,11 +19,7 @@ const event = {
         }
         catch (error) {
             logger.error(`Erreur lors de l'exécution de /${interaction.commandName}`, error);
-            const errorEmbed = new EmbedBuilder()
-                .setTitle('❌ Une erreur est survenue')
-                .setDescription('Une erreur interne empêche l\'exécution de cette commande.')
-                .setColor(Colors.Red)
-                .setFooter({ text: `ID de l'erreur : ${Date.now()}` });
+            const errorEmbed = Templates.error(`Une erreur interne empêche l'exécution de cette commande.`);
             if (interaction.replied || interaction.deferred) {
                 await interaction.followUp({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
             }
