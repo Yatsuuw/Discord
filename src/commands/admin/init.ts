@@ -1,7 +1,6 @@
 import { ChatInputCommandInteraction, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
-import { db } from "../../utils/database.js";
 
 export const command = {
   data: new SlashCommandBuilder()
@@ -11,29 +10,22 @@ export const command = {
   async execute(interaction: ChatInputCommandInteraction) {
     if (!interaction.guild) return;
 
-    const guildId = interaction.guild.id;
+    const { id: guildId, ownerId, name } = interaction.guild;
 
     try {
-      const existingServer = await db.servers.findUnique({
-        where: {
-          id_owner: {
-            id: guildId,
-            owner: interaction.guild.ownerId
-          }
-        }
-      });
+      const existing = await DataManager.getServer(guildId, ownerId);
 
-      if (existingServer) {
+      if (existing) {
         return interaction.reply({
-          embeds: [Templates.info('Information `/init` - Administration', [ { name: 'Retour de la base de données :', value: `Ce serveur est déjà enregistré dans la base de données.` } ])],
+          embeds: [Templates.info('Serveur déjà enregistré', [ { name: 'Information', value: `Ce serveur est déjà enregistré dans la base de données.` } ])],
           flags: MessageFlags.Ephemeral
         });
       }
 
-      await DataManager.registerServer(guildId, interaction.guild.ownerId);
+      await DataManager.registerServer(guildId, ownerId);
 
       return interaction.reply({
-        embeds: [Templates.success(`Le serveur **${interaction.guild.name}** a été initialisé dans la base de données avec succès.`)]
+        embeds: [Templates.success(`Le serveur **${name}** a été initialisé dans la base de données avec succès.`)]
       });
     } catch (error) {
       return interaction.reply({
