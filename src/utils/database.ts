@@ -2,14 +2,17 @@ import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "../generated/prisma/index.js";
 import { logger } from "./logger.js";
 
-const dbUrl = new URL(process.env.DATABASE_URL!);
+const rawUrl = process.env.DATABASE_URL;
+if (!rawUrl) throw new Error('Variable d\'environnement manquante : DATABASE_URL');
+
+const dbUrl = new URL(rawUrl);
 
 const adapter = new PrismaMariaDb({
   host: dbUrl.hostname,
-  port: Number(dbUrl.port),
+  port: Number(dbUrl.port) || 3306,
   user: dbUrl.username,
   password: dbUrl.password,
-  database: dbUrl.pathname.replace("/", ""),
+  database: dbUrl.pathname.slice(1),
   connectionLimit: 5,
 });
 
