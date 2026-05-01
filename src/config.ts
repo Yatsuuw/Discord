@@ -1,5 +1,11 @@
+function requireEnv(key: string): string {
+  const value = process.env[key];
+  if (!value) throw new Error(`Variable d'environnement manquante : ${key}`);
+  return value;
+}
+
 export const config = {
-  token: process.env.DISCORD_TOKEN,
-  clientId: process.env.CLIENT_ID,
-  guildId: process.env.GUILD_ID,
-};
+  token: requireEnv('DISCORD_TOKEN'),
+  clientId: requireEnv('CLIENT_ID'),
+  guildId: requireEnv('GUILD_ID'),
+} as const;
