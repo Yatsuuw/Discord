@@ -38,8 +38,13 @@ export const DataManager = {
   },
 
   async getServer(guildId: string, ownerId: string) {
-    return await db.servers.findUnique({
-      where: { id_owner: { id: guildId, owner: ownerId } },
-    });
+    try {
+      return await db.servers.findUnique({
+        where: { id_owner: { id: guildId, owner: ownerId } },
+      });
+    } catch (error) {
+      logger.error(`Erreir de lecture du serveur ${guildId} :`, error);
+      throw error;
+    }
   },
 };
