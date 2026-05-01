@@ -1,8 +1,8 @@
-import { ChatInputCommandInteraction, type ClientEvents, SlashCommandBuilder } from 'discord.js';
+import { ChatInputCommandInteraction, type ClientEvents, type RESTPostAPIApplicationCommandsJSONBody } from 'discord.js';
 import { ExtendedClient } from '../structures/ExtendedClient.js';
 
 export interface Command {
-  data: SlashCommandBuilder;
+  data: { toJSON(): RESTPostAPIApplicationCommandsJSONBody; name: string };
   execute: (interaction: ChatInputCommandInteraction, client: ExtendedClient) => Promise<void> | void;
 }
 
