@@ -30,7 +30,7 @@ const command: Command = {
 
       if (!userData) {
         const errorMsg = target.id === interaction.user.id
-          ? 'Vous n\'avez aucun profil enregistré. Utilisez `/set-profil` pour l\'enregistrer !'
+          ? 'Vous n\'avez aucun profil enregistré. Utilisez `/config_profil` pour l\'enregistrer !'
           : `L'utilisateur **${target.username}** n'a aucun profil enregistré.`;
 
         await interaction.reply({
