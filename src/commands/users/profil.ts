@@ -1,7 +1,30 @@
-import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { DataManager } from "../../utils/dataManager.js";
-import { Templates } from "../../utils/templates.js";
-import type { Command } from "../../types/index.js";
+import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from 'discord.js';
+import { DataManager } from '../../utils/dataManager.js';
+import { Templates } from '../../utils/templates.js';
+import type { Command } from '../../types/index.js';
+import type { users } from '../../generated/prisma/index.js';
+
+const SITE_CONFIG: Record<string, {
+  label:       string;
+  getUsername: (u: users) => string | null;
+  buildUrl:    (username: string) => string;
+}> = {
+  mal: {
+    label:       'MyAnimeList',
+    getUsername: u => u.mal_username,
+    buildUrl:    n => `https://myanimelist.net/profile/${n}`,
+  },
+  al: {
+    label:       'AniList',
+    getUsername: u => u.al_username,
+    buildUrl:    n => `https://anilist.co/user/${n}`,
+  },
+  mc: {
+    label:       'MangaCollec',
+    getUsername: u => u.mangacollec,
+    buildUrl:    n => `https://www.mangacollec.com/user/${n}/collection`,
+  },
+};
 
 const command: Command = {
   data: new SlashCommandBuilder()
@@ -13,8 +36,8 @@ const command: Command = {
         .setRequired(true)
         .addChoices(
           { name: 'MyAnimeList', value: 'mal' },
-          { name: 'AniList', value: 'al' },
-          { name: 'MangaCollec', value: 'mc' }
+          { name: 'AniList',     value: 'al'  },
+          { name: 'MangaCollec', value: 'mc'  },
         )
     )
     .addUserOption(option =>
@@ -22,67 +45,51 @@ const command: Command = {
         .setDescription('Le membre dont vous voulez voir le profil')
         .setRequired(false)
     ),
-    async execute(interaction: ChatInputCommandInteraction) {
-      const target = interaction.options.getUser('membre') ?? interaction.user;
-      const site = interaction.options.getString('site', true);
 
-      const userData = await DataManager.getUser(target.id);
+  async execute(interaction: ChatInputCommandInteraction) {
+    const target = interaction.options.getUser('membre') ?? interaction.user;
+    const site   = interaction.options.getString('site', true);
 
-      if (!userData) {
-        const errorMsg = target.id === interaction.user.id
-          ? 'Vous n\'avez aucun profil enregistré. Utilisez `/config_profil` pour l\'enregistrer !'
-          : `L'utilisateur **${target.username}** n'a aucun profil enregistré.`;
+    const userData = await DataManager.getUser(target.id).catch(() => null);
 
-        await interaction.reply({
-          embeds: [Templates.error(errorMsg)],
-          flags: MessageFlags.Ephemeral
-        });
-        return;
-      }
-
-      let profileName: string | null = null;
-      let url = '';
-      let siteName = '';
-
-      switch (site) {
-        case 'mal':
-          profileName = userData.mal_username;
-          url = `https://myanimelist.net/profile/${profileName}`;
-          siteName = 'MyAnimeList';
-          break;
-        case 'al':
-          profileName = userData.al_username;
-          url = `https://anilist.co/user/${profileName}`;
-          siteName = 'AniList';
-          break;
-        case 'mc':
-          profileName = userData.mangacollec;
-          url = `https://www.mangacollec.com/user/${profileName}/collection`;
-          siteName = 'MangaCollec';
-          break;
-      }
-
-      if (!profileName) {
-        const errorMsg = target.id === interaction.user.id
-          ? `Vous n'avez pas lié votre compte **${siteName}**.`
-          : `**${target.username}** n'a pas lié son compte **${siteName}**.`;
-
-        await interaction.reply({
-          embeds: [Templates.error(errorMsg)],
-          flags: MessageFlags.Ephemeral
-        });
-        return;
-      }
-
-      const embed = Templates.info(`${siteName} - ${target.username}`, [
-        { name: 'Lien du profil', value: `[Lien vers la page ${siteName}](${url})` }
-      ]);
-
-      embed.setThumbnail(target.displayAvatarURL({ size: 512 }));
-
-      await interaction.reply({ embeds: [embed] });
+    if (userData === null) {
+      await interaction.reply({
+        embeds: [Templates.error('Erreur lors de la récupération du profil. Réessaye dans quelques instants.')],
+        flags:  MessageFlags.Ephemeral,
+      });
       return;
     }
+
+    if (!userData) {
+      const msg = target.id === interaction.user.id
+        ? 'Vous n\'avez aucun profil enregistré. Utilisez `/config_profil` pour l\'enregistrer !'
+        : `L'utilisateur **${target.username}** n'a aucun profil enregistré.`;
+      await interaction.reply({ embeds: [Templates.error(msg)], flags: MessageFlags.Ephemeral });
+      return;
+    }
+
+    const siteConfig = SITE_CONFIG[site];
+    if (!siteConfig) return;
+
+    const profileName = siteConfig.getUsername(userData);
+
+    if (!profileName) {
+      const msg = target.id === interaction.user.id
+        ? `Vous n'avez pas lié votre compte **${siteConfig.label}**.`
+        : `**${target.username}** n'a pas lié son compte **${siteConfig.label}**.`;
+      await interaction.reply({ embeds: [Templates.error(msg)], flags: MessageFlags.Ephemeral });
+      return;
+    }
+
+    const url   = siteConfig.buildUrl(profileName);
+    const embed = Templates.info(`${siteConfig.label} - ${target.username}`, [
+      { name: 'Lien du profil', value: `[Lien vers la page ${siteConfig.label}](${url})` },
+    ]);
+
+    embed.setThumbnail(target.displayAvatarURL({ size: 512 }));
+
+    await interaction.reply({ embeds: [embed] });
+  },
 };
 
 export default command;
