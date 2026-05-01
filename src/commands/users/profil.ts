@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from '
 import { DataManager } from '../../utils/dataManager.js';
 import { Templates } from '../../utils/templates.js';
 import type { Command } from '../../types/index.js';
-import { SITE_CONFIG } from './config_profil.js';
+import { SITE_CONFIG } from '../../utils/siteConfig.js';
 import { logger } from '../../utils/logger.js';
 
 const command: Command = {

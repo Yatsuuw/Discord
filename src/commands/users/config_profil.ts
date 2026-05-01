@@ -1,31 +1,9 @@
-import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
-import { DataManager } from "../../utils/dataManager.js";
-import { Templates } from "../../utils/templates.js";
-import type { Command } from "../../types/index.js";
-import type { users } from "../../generated/prisma/index.js";
-import { logger } from "../../utils/logger.js";
-
-export const SITE_CONFIG: Record<string, {
-  label:       string;
-  getUsername: (u: users) => string | null;
-  buildUrl:    (username: string) => string;
-}> = {
-  mal: {
-    label:       'MyAnimeList',
-    getUsername: u => u.mal_username,
-    buildUrl:    n => `https://myanimelist.net/profile/${n}`,
-  },
-  al: {
-    label:       'AniList',
-    getUsername: u => u.al_username,
-    buildUrl:    n => `https://anilist.co/user/${n}`,
-  },
-  mc: {
-    label:       'MangaCollec',
-    getUsername: u => u.mangacollec,
-    buildUrl:    n => `https://www.mangacollec.com/user/${n}/collection`,
-  },
-};
+import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from 'discord.js';
+import { DataManager } from '../../utils/dataManager.js';
+import { Templates } from '../../utils/templates.js';
+import { SITE_CONFIG } from '../../utils/siteConfig.js';
+import { logger } from '../../utils/logger.js';
+import type { Command } from '../../types/index.js';
 
 const command: Command = {
   data: new SlashCommandBuilder()
@@ -37,46 +15,43 @@ const command: Command = {
         .setRequired(true)
         .addChoices(
           { name: 'MyAnimeList', value: 'mal' },
-          { name: 'AniList', value: 'al' },
-          { name: 'MangaCollec', value: 'mc' }
+          { name: 'AniList',     value: 'al'  },
+          { name: 'MangaCollec', value: 'mc'  },
         )
     )
     .addStringOption(option =>
       option.setName('nom')
-        .setDescription('Votre nom d\'utilisateur sur le site')
+        .setDescription('Votre nom d\'utilisateur sur le site (laisser vide pour supprimer)')
         .setRequired(false)
     ),
-    async execute(interaction: ChatInputCommandInteraction) {
-      const userId = interaction.user.id;
-      const site = interaction.options.getString('site', true);
-      const username = interaction.options.getString('nom', false);
 
-      try {
-        const current = await DataManager.getUser(userId);
+  async execute(interaction: ChatInputCommandInteraction) {
+    const userId   = interaction.user.id;
+    const site     = interaction.options.getString('site', true);
+    const username = interaction.options.getString('nom', false);
 
-        const mal = site === 'mal' ? username : (current?.mal_username ?? null);
-        const al = site === 'al' ? username : (current?.al_username ?? null);
-        const mc = site === 'mc' ? username : (current?.mangacollec ?? null);
+    try {
+      await DataManager.upsertUser(userId, {
+        ...(site === 'mal' && { mal: username }),
+        ...(site === 'al'  && { al:  username }),
+        ...(site === 'mc'  && { mc:  username }),
+      });
 
-        await DataManager.upsertUser(userId, { mal, al, mc });
+      const siteName = SITE_CONFIG[site]?.label ?? site;
+      const action   = username === null ? 'supprimé' : 'enregistré';
 
-        const siteName = SITE_CONFIG[site]?.label ?? site;
-        const action = username === null ? 'supprimé' : 'enregistré';
-
-        await interaction.reply({
-          embeds: [Templates.success(`Votre pseudo **${siteName}** a été ${action} avec succès.`)],
-          flags: MessageFlags.Ephemeral
-        });
-        return;
-      } catch (error) {
-        logger.error(`Une erreur est survenue lors de la mise à jour du profil ${userId} :`, error)
-        await interaction.reply({
-          embeds: [Templates.error(`Une erreur est survenue lors de la mise à jour de votre profil.`)],
-          flags: MessageFlags.Ephemeral
-        });
-        return;
-      }
+      await interaction.reply({
+        embeds: [Templates.success(`Votre pseudo **${siteName}** a été ${action} avec succès.`)],
+        flags:  MessageFlags.Ephemeral,
+      });
+    } catch (error) {
+      logger.error(`Erreur config_profil pour ${userId} :`, error);
+      await interaction.reply({
+        embeds: [Templates.error('Une erreur est survenue lors de la mise à jour de votre profil.')],
+        flags:  MessageFlags.Ephemeral,
+      });
     }
+  },
 };
 
 export default command;
