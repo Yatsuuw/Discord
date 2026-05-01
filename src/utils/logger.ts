@@ -27,8 +27,9 @@ function timestamp() {
 }
 
 function writeToFile(level: string, message: string, error?: unknown, time?: string, date?: string): void {
-  const ts = time ?? timestamp().time;
-  const d = date ??  timestamp().date;
+  let ts = time, d = date;
+  if (!ts || !d) { const t = timestamp(); ts ??= t.time; d ??= t.date }
+
   let logMessage = `[${ts}] [${level}] ${message}\n`;
   if (error) logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
 
