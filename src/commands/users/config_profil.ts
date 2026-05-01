@@ -1,8 +1,9 @@
 import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
+import type { Command } from "../../types/index.js";
 
-const command = {
+const command: Command = {
   data: new SlashCommandBuilder()
     .setName('config_profil')
     .setDescription('Enregistre ou modifie vos pseudos des différents sites')
@@ -38,15 +39,17 @@ const command = {
         const siteName = site === 'mal' ? 'MyAnimeList' : site === 'al' ? 'AniList' : 'MangaCollec';
         const action = username === null ? 'supprimé' : 'enregistré';
 
-        return interaction.reply({
+        await interaction.reply({
           embeds: [Templates.success(`Votre pseudo **${siteName}** a été ${action} avec succès.`)],
           flags: MessageFlags.Ephemeral
         });
+        return;
       } catch (error) {
-        return interaction.reply({
+        await interaction.reply({
           embeds: [Templates.error(`Une erreur est survenue lors de la mise à jour de votre profil : ${error}`)],
           flags: MessageFlags.Ephemeral
         });
+        return;
       }
     }
 };
