@@ -4,7 +4,7 @@ import { Templates } from "../../utils/templates.js";
 
 export const command = {
   data: new SlashCommandBuilder()
-    .setName('set-profil')
+    .setName('config_profil')
     .setDescription('Enregistre ou modifie vos pseudos des différents sites')
     .addStringOption(option =>
       option.setName('site')
@@ -17,7 +17,7 @@ export const command = {
         )
     )
     .addStringOption(option =>
-      option.setName('utilisateur')
+      option.setName('nom')
         .setDescription('Votre nom d\'utilisateur sur le site')
         .setRequired(false)
     ),
