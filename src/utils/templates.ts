@@ -1,13 +1,36 @@
 import { EmbedBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 
 export const Templates = {
-  success: (content: string) => {
-    return new EmbedBuilder()
+  success: (content: string) =>
+    new EmbedBuilder()
       .setColor(Colors.Green)
       .setTitle('✅ Opération réussie')
       .setDescription(content)
-      .setTimestamp();
-  },
+      .setFooter({ text: "Tsuyomi" })
+      .setTimestamp(),
+
+  error: (content: string) =>
+    new EmbedBuilder()
+      .setColor(Colors.Red)
+      .setTitle('❌ Erreur')
+      .setDescription(content)
+      .setFooter({ text: "Tsuyomi" })
+      .setTimestamp(),
+
+  warning: (description: string) =>
+    new EmbedBuilder()
+      .setColor(Colors.Yellow)
+      .setTitle('⚠️ Avertissement')
+      .setDescription(description)
+      .setFooter({ text: "Tsuyomi" })
+      .setTimestamp(),
+
+  info: (title: string, fields: { name: string, value: string, inline?: boolean }[]) =>
+    new EmbedBuilder()
+      .setColor(Colors.Blurple)
+      .setTitle(title)
+      .addFields(fields)
+      .setTimestamp(),
 
   request: (title: string, description: string) => {
     const embed = new EmbedBuilder()
@@ -28,21 +51,5 @@ export const Templates = {
     );
 
     return { embeds: [embed], components: [buttons] };
-  },
-
-  info: (title: string, fields: { name: string, value: string }[]) => {
-    return new EmbedBuilder()
-      .setColor(Colors.Blurple)
-      .setTitle(title)
-      .addFields(fields)
-      .setTimestamp();
-  },
-
-  error: (content: string) => {
-    return new EmbedBuilder()
-      .setColor(Colors.Red)
-      .setTitle('❌ Erreur')
-      .setDescription(content)
-      .setTimestamp();
   },
 };
