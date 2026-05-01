@@ -9,8 +9,8 @@ export const command = {
         .setDescription('Le site à consulter')
         .setRequired(true)
         .addChoices({ name: 'MyAnimeList', value: 'mal' }, { name: 'AniList', value: 'al' }, { name: 'MangaCollec', value: 'mc' }))
-        .addUserOption(option => option.setName('utilisateur')
-        .setDescription('L\'utilisateur dont vous voulez voir le profil')
+        .addUserOption(option => option.setName('membre')
+        .setDescription('Le membre dont vous voulez voir le profil')
         .setRequired(false)),
     async execute(interaction) {
         const target = interaction.options.getUser('utilisateur') ?? interaction.user;

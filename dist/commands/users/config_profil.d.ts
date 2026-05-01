@@ -4,4 +4,4 @@ export declare const command: {
     execute(interaction: ChatInputCommandInteraction): Promise<import("discord.js").InteractionResponse<boolean>>;
 };
 export default command;
-//# sourceMappingURL=set-profil.d.ts.map
+//# sourceMappingURL=config_profil.d.ts.map

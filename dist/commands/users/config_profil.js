@@ -3,13 +3,13 @@ import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
 export const command = {
     data: new SlashCommandBuilder()
-        .setName('set-profil')
+        .setName('config_profil')
         .setDescription('Enregistre ou modifie vos pseudos des différents sites')
         .addStringOption(option => option.setName('site')
         .setDescription('Le site sur lequel vous voulez enregistrer votre profil')
         .setRequired(true)
         .addChoices({ name: 'MyAnimeList', value: 'mal' }, { name: 'AniList', value: 'al' }, { name: 'MangaCollec', value: 'mc' }))
-        .addStringOption(option => option.setName('utilisateur')
+        .addStringOption(option => option.setName('nom')
         .setDescription('Votre nom d\'utilisateur sur le site')
         .setRequired(false)),
     async execute(interaction) {
@@ -43,4 +43,4 @@ export const command = {
     }
 };
 export default command;
-//# sourceMappingURL=set-profil.js.map
+//# sourceMappingURL=config_profil.js.map
