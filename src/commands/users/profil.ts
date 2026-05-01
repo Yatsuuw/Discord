@@ -1,8 +1,9 @@
 import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
+import type { Command } from "../../types/index.js";
 
-export const command = {
+const command: Command = {
   data: new SlashCommandBuilder()
     .setName('profil')
     .setDescription('Affiche le profil externe d\'un utilisateur')
@@ -22,7 +23,7 @@ export const command = {
         .setRequired(false)
     ),
     async execute(interaction: ChatInputCommandInteraction) {
-      const target = interaction.options.getUser('utilisateur') ?? interaction.user;
+      const target = interaction.options.getUser('membre') ?? interaction.user;
       const site = interaction.options.getString('site', true);
 
       const userData = await DataManager.getUser(target.id);
@@ -32,10 +33,11 @@ export const command = {
           ? 'Vous n\'avez aucun profil enregistré. Utilisez `/set-profil` pour l\'enregistrer !'
           : `L'utilisateur **${target.username}** n'a aucun profil enregistré.`;
 
-        return interaction.reply({
+        await interaction.reply({
           embeds: [Templates.error(errorMsg)],
           flags: MessageFlags.Ephemeral
         });
+        return;
       }
 
       let profileName: string | null = null;
@@ -65,10 +67,11 @@ export const command = {
           ? `Vous n'avez pas lié votre compte **${siteName}**.`
           : `**${target.username}** n'a pas lié son compte **${siteName}**.`;
 
-        return interaction.reply({
+        await interaction.reply({
           embeds: [Templates.error(errorMsg)],
           flags: MessageFlags.Ephemeral
         });
+        return;
       }
 
       const embed = Templates.info(`${siteName} - ${target.username}`, [
@@ -77,7 +80,8 @@ export const command = {
 
       embed.setThumbnail(target.displayAvatarURL({ size: 512 }));
 
-      return interaction.reply({ embeds: [embed] });
+      await interaction.reply({ embeds: [embed] });
+      return;
     }
 };
 
