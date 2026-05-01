@@ -50,12 +50,13 @@ const command: Command = {
     const target = interaction.options.getUser('membre') ?? interaction.user;
     const site   = interaction.options.getString('site', true);
 
-    const userData = await DataManager.getUser(target.id).catch(() => null);
-
-    if (userData === null) {
+    let userData;
+    try {
+      userData = await DataManager.getUser(target.id).catch(() => null);
+    } catch {
       await interaction.reply({
-        embeds: [Templates.error('Erreur lors de la récupération du profil. Réessaye dans quelques instants.')],
-        flags:  MessageFlags.Ephemeral,
+        embeds: [Templates.error('Erreur lors de la récupération du profil. Réessaie dans quelques instants.')],
+        flags: MessageFlags.Ephemeral,
       });
       return;
     }
