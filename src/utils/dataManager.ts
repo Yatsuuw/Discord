@@ -7,25 +7,21 @@ export const DataManager = {
       return await db.users.findUnique({ where: { user: userId } });
     } catch (error) {
       logger.error(`Erreur de lecture utilisateur ${userId} :`, error);
-      return null;
+      throw error;
     }
   },
 
-  async upsertUser(userId: string, mal?: string, al?: string, mc?: string) {
-    return await db.users.upsert({
+  async upsertUser(userId: string, mal: string | null, al: string | null, mc: string | null) {
+    try {
+      return await db.users.upsert({
       where: { user: userId },
-      update: {
-        mal_username: mal ?? null,
-        al_username: al ?? null,
-        mangacollec: mc ?? null,
-      },
-      create: {
-        user: userId,
-        mal_username: mal ?? null,
-        al_username: al ?? null,
-        mangacollec: mc ?? null,
-      }
+      update: { mal_username: mal, al_username: al, mangacollec: mc },
+      create: { user: userId, mal_username: mal, al_username: al, mangacollec: mc }
     });
+    } catch (error) {
+      logger.error(`Erreur de la mise à jour de l'utilisateur ${userId} :`, error);
+      throw error;
+    }
   },
 
   async registerServer(guildId: string, ownerId: string) {
@@ -39,5 +35,11 @@ export const DataManager = {
       logger.error(`Erreur d'enregistrement du serveur ${guildId} :`, error);
       throw error;
     }
-  }
+  },
+
+  async getServer(guildId: string, ownerId: string) {
+    return await db.servers.findUnique({
+      where: { id_owner: { id: guildId, owner: ownerId } },
+    });
+  },
 };
