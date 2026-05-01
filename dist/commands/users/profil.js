@@ -1,23 +1,8 @@
 import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from 'discord.js';
 import { DataManager } from '../../utils/dataManager.js';
 import { Templates } from '../../utils/templates.js';
-const SITE_CONFIG = {
-    mal: {
-        label: 'MyAnimeList',
-        getUsername: u => u.mal_username,
-        buildUrl: n => `https://myanimelist.net/profile/${n}`,
-    },
-    al: {
-        label: 'AniList',
-        getUsername: u => u.al_username,
-        buildUrl: n => `https://anilist.co/user/${n}`,
-    },
-    mc: {
-        label: 'MangaCollec',
-        getUsername: u => u.mangacollec,
-        buildUrl: n => `https://www.mangacollec.com/user/${n}/collection`,
-    },
-};
+import { SITE_CONFIG } from './config_profil.js';
+import { logger } from '../../utils/logger.js';
 const command = {
     data: new SlashCommandBuilder()
         .setName('profil')
@@ -32,10 +17,14 @@ const command = {
     async execute(interaction) {
         const target = interaction.options.getUser('membre') ?? interaction.user;
         const site = interaction.options.getString('site', true);
-        const userData = await DataManager.getUser(target.id).catch(() => null);
-        if (userData === null) {
+        let userData;
+        try {
+            userData = await DataManager.getUser(target.id).catch(() => null);
+        }
+        catch (error) {
+            logger.error(`Une erreur est survenue lors de la récupération d'un profil.`, error);
             await interaction.reply({
-                embeds: [Templates.error('Erreur lors de la récupération du profil. Réessaye dans quelques instants.')],
+                embeds: [Templates.error('Erreur lors de la récupération du profil. Réessaie dans quelques instants.')],
                 flags: MessageFlags.Ephemeral,
             });
             return;
