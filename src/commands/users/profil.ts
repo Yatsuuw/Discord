@@ -55,7 +55,7 @@ export const command = {
           break;
         case 'mc':
           profileName = userData.mangacollec;
-          url = `https://mangacollec.com/profile/${profileName}`;
+          url = `https://www.mangacollec.com/user/${profileName}/collection`;
           siteName = 'MangaCollec';
           break;
       }
