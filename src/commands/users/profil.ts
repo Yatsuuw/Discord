@@ -2,29 +2,8 @@ import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from '
 import { DataManager } from '../../utils/dataManager.js';
 import { Templates } from '../../utils/templates.js';
 import type { Command } from '../../types/index.js';
-import type { users } from '../../generated/prisma/index.js';
-
-const SITE_CONFIG: Record<string, {
-  label:       string;
-  getUsername: (u: users) => string | null;
-  buildUrl:    (username: string) => string;
-}> = {
-  mal: {
-    label:       'MyAnimeList',
-    getUsername: u => u.mal_username,
-    buildUrl:    n => `https://myanimelist.net/profile/${n}`,
-  },
-  al: {
-    label:       'AniList',
-    getUsername: u => u.al_username,
-    buildUrl:    n => `https://anilist.co/user/${n}`,
-  },
-  mc: {
-    label:       'MangaCollec',
-    getUsername: u => u.mangacollec,
-    buildUrl:    n => `https://www.mangacollec.com/user/${n}/collection`,
-  },
-};
+import { SITE_CONFIG } from './config_profil.js';
+import { logger } from '../../utils/logger.js';
 
 const command: Command = {
   data: new SlashCommandBuilder()
@@ -53,7 +32,8 @@ const command: Command = {
     let userData;
     try {
       userData = await DataManager.getUser(target.id).catch(() => null);
-    } catch {
+    } catch (error) {
+      logger.error(`Une erreur est survenue lors de la récupération d'un profil.`, error)
       await interaction.reply({
         embeds: [Templates.error('Erreur lors de la récupération du profil. Réessaie dans quelques instants.')],
         flags: MessageFlags.Ephemeral,

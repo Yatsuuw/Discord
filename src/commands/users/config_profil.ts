@@ -2,6 +2,30 @@ import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
 import type { Command } from "../../types/index.js";
+import type { users } from "../../generated/prisma/index.js";
+import { logger } from "../../utils/logger.js";
+
+export const SITE_CONFIG: Record<string, {
+  label:       string;
+  getUsername: (u: users) => string | null;
+  buildUrl:    (username: string) => string;
+}> = {
+  mal: {
+    label:       'MyAnimeList',
+    getUsername: u => u.mal_username,
+    buildUrl:    n => `https://myanimelist.net/profile/${n}`,
+  },
+  al: {
+    label:       'AniList',
+    getUsername: u => u.al_username,
+    buildUrl:    n => `https://anilist.co/user/${n}`,
+  },
+  mc: {
+    label:       'MangaCollec',
+    getUsername: u => u.mangacollec,
+    buildUrl:    n => `https://www.mangacollec.com/user/${n}/collection`,
+  },
+};
 
 const command: Command = {
   data: new SlashCommandBuilder()
@@ -36,7 +60,7 @@ const command: Command = {
 
         await DataManager.upsertUser(userId, { mal, al, mc });
 
-        const siteName = site === 'mal' ? 'MyAnimeList' : site === 'al' ? 'AniList' : 'MangaCollec';
+        const siteName = SITE_CONFIG[site]?.label ?? site;
         const action = username === null ? 'supprimé' : 'enregistré';
 
         await interaction.reply({
@@ -45,8 +69,9 @@ const command: Command = {
         });
         return;
       } catch (error) {
+        logger.error(`Une erreur est survenue lors de la mise à jour du profil ${userId} :`, error)
         await interaction.reply({
-          embeds: [Templates.error(`Une erreur est survenue lors de la mise à jour de votre profil : ${error}`)],
+          embeds: [Templates.error(`Une erreur est survenue lors de la mise à jour de votre profil.`)],
           flags: MessageFlags.Ephemeral
         });
         return;
