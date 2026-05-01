@@ -7,24 +7,21 @@ export const DataManager = {
         }
         catch (error) {
             logger.error(`Erreur de lecture utilisateur ${userId} :`, error);
-            return null;
+            throw error;
         }
     },
     async upsertUser(userId, mal, al, mc) {
-        return await db.users.upsert({
-            where: { user: userId },
-            update: {
-                mal_username: mal ?? null,
-                al_username: al ?? null,
-                mangacollec: mc ?? null,
-            },
-            create: {
-                user: userId,
-                mal_username: mal ?? null,
-                al_username: al ?? null,
-                mangacollec: mc ?? null,
-            }
-        });
+        try {
+            return await db.users.upsert({
+                where: { user: userId },
+                update: { mal_username: mal, al_username: al, mangacollec: mc },
+                create: { user: userId, mal_username: mal, al_username: al, mangacollec: mc }
+            });
+        }
+        catch (error) {
+            logger.error(`Erreur de la mise à jour de l'utilisateur ${userId} :`, error);
+            throw error;
+        }
     },
     async registerServer(guildId, ownerId) {
         try {
@@ -38,6 +35,11 @@ export const DataManager = {
             logger.error(`Erreur d'enregistrement du serveur ${guildId} :`, error);
             throw error;
         }
-    }
+    },
+    async getServer(guildId, ownerId) {
+        return await db.servers.findUnique({
+            where: { id_owner: { id: guildId, owner: ownerId } },
+        });
+    },
 };
 //# sourceMappingURL=dataManager.js.map

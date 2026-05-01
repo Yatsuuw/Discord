@@ -1,7 +1,4 @@
-import { ChatInputCommandInteraction } from "discord.js";
-export declare const command: {
-    data: import("discord.js").SlashCommandOptionsOnlyBuilder;
-    execute(interaction: ChatInputCommandInteraction): Promise<import("discord.js").InteractionResponse<boolean>>;
-};
+import type { Command } from "../../types/index.js";
+declare const command: Command;
 export default command;
 //# sourceMappingURL=profil.d.ts.map

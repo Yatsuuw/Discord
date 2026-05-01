@@ -18,16 +18,9 @@ export const command = {
         const username = interaction.options.getString('nom', false);
         try {
             const current = await DataManager.getUser(userId);
-            let mal = current?.mal_username ?? undefined;
-            let al = current?.al_username ?? undefined;
-            let mc = current?.mangacollec ?? undefined;
-            const newUsername = username ?? undefined;
-            if (site === 'mal')
-                mal = newUsername;
-            if (site === 'al')
-                al = newUsername;
-            if (site === 'mc')
-                mc = newUsername;
+            const mal = site === 'mal' ? username : (current?.mal_username ?? null);
+            const al = site === 'al' ? username : (current?.al_username ?? null);
+            const mc = site === 'mc' ? username : (current?.mangacollec ?? null);
             await DataManager.upsertUser(userId, mal, al, mc);
             const siteName = site === 'mal' ? 'MyAnimeList' : site === 'al' ? 'AniList' : 'MangaCollec';
             const action = username === null ? 'supprimé' : 'enregistré';

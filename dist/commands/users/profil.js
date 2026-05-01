@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
-export const command = {
+const command = {
     data: new SlashCommandBuilder()
         .setName('profil')
         .setDescription('Affiche le profil externe d\'un utilisateur')
@@ -13,17 +13,18 @@ export const command = {
         .setDescription('Le membre dont vous voulez voir le profil')
         .setRequired(false)),
     async execute(interaction) {
-        const target = interaction.options.getUser('utilisateur') ?? interaction.user;
+        const target = interaction.options.getUser('membre') ?? interaction.user;
         const site = interaction.options.getString('site', true);
         const userData = await DataManager.getUser(target.id);
         if (!userData) {
             const errorMsg = target.id === interaction.user.id
                 ? 'Vous n\'avez aucun profil enregistré. Utilisez `/set-profil` pour l\'enregistrer !'
                 : `L'utilisateur **${target.username}** n'a aucun profil enregistré.`;
-            return interaction.reply({
+            await interaction.reply({
                 embeds: [Templates.error(errorMsg)],
                 flags: MessageFlags.Ephemeral
             });
+            return;
         }
         let profileName = null;
         let url = '';
@@ -49,16 +50,18 @@ export const command = {
             const errorMsg = target.id === interaction.user.id
                 ? `Vous n'avez pas lié votre compte **${siteName}**.`
                 : `**${target.username}** n'a pas lié son compte **${siteName}**.`;
-            return interaction.reply({
+            await interaction.reply({
                 embeds: [Templates.error(errorMsg)],
                 flags: MessageFlags.Ephemeral
             });
+            return;
         }
         const embed = Templates.info(`${siteName} - ${target.username}`, [
             { name: 'Lien du profil', value: `[Lien vers la page ${siteName}](${url})` }
         ]);
         embed.setThumbnail(target.displayAvatarURL({ size: 512 }));
-        return interaction.reply({ embeds: [embed] });
+        await interaction.reply({ embeds: [embed] });
+        return;
     }
 };
 export default command;

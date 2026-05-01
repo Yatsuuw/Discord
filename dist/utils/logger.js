@@ -1,4 +1,4 @@
-import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
+import { appendFile, existsSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -16,14 +16,10 @@ if (!existsSync(logsDir)) {
 function writeToFile(level, message, error) {
     const now = new Date();
     const date = now.toISOString().split('T')[0];
-    const time = now.toLocaleTimeString();
-    const fileName = `${date}.log`;
-    const filePath = join(logsDir, fileName);
-    let logMessage = `[${time}] [${level.toUpperCase()}] ${message}\n`;
-    if (error) {
+    let logMessage = `[${now.toLocaleTimeString()}] [${level}] ${message}\n`;
+    if (error)
         logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
-    }
-    appendFileSync(filePath, logMessage, 'utf8');
+    appendFile(join(logsDir, `${date}.log`), logMessage, 'utf8', () => { });
 }
 export const logger = {
     info: (message) => {
@@ -39,6 +35,12 @@ export const logger = {
         if (error)
             console.error(error);
         writeToFile('ERROR', message, error);
+    },
+    debug: (message) => {
+        if (process.env.NODE_ENV !== 'production') {
+            console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${new Date().toLocaleTimeString()}] ${message}`);
+            writeToFile('DEBUG', message);
+        }
     },
 };
 //# sourceMappingURL=logger.js.map

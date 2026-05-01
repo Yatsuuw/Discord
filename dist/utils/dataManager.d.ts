@@ -5,7 +5,7 @@ export declare const DataManager: {
         al_username: string | null;
         mangacollec: string | null;
     } | null>;
-    upsertUser(userId: string, mal?: string, al?: string, mc?: string): Promise<{
+    upsertUser(userId: string, mal: string | null, al: string | null, mc: string | null): Promise<{
         user: string;
         mal_username: string | null;
         al_username: string | null;
@@ -15,5 +15,9 @@ export declare const DataManager: {
         id: string;
         owner: string;
     }>;
+    getServer(guildId: string, ownerId: string): Promise<{
+        id: string;
+        owner: string;
+    } | null>;
 };
 //# sourceMappingURL=dataManager.d.ts.map
