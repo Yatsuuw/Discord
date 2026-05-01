@@ -2,7 +2,7 @@ import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
 
-export const command = {
+const command = {
   data: new SlashCommandBuilder()
     .setName('config_profil')
     .setDescription('Enregistre ou modifie vos pseudos des différents sites')
