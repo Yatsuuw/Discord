@@ -1,6 +1,12 @@
 import { db } from "./database.js";
 import { logger } from "./logger.js";
 
+interface UserProfiles {
+  mal?: string | null;
+  al?: string | null;
+  mc?: string | null;
+}
+
 export const DataManager = {
   async getUser(userId: string) {
     try {
@@ -11,8 +17,12 @@ export const DataManager = {
     }
   },
 
-  async upsertUser(userId: string, mal: string | null, al: string | null, mc: string | null) {
+  async upsertUser(userId: string, profiles: Partial<UserProfiles>) {
     try {
+      const mal = profiles.mal ?? null;
+      const al = profiles.al ?? null;
+      const mc = profiles.mc ?? null;
+
       return await db.users.upsert({
         where: { user: userId },
         update: { mal_username: mal, al_username: al, mangacollec: mc },
