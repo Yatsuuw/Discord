@@ -30,8 +30,8 @@ export interface AniListPage {
   hasPrev:  boolean;
 }
 
-const ANILIST_API      = 'https://graphql.anilist.co';
-export const PER_PAGE  = 10;
+const ANILIST_API     = 'https://graphql.anilist.co';
+export const PER_PAGE = 10;
 
 const STATUS_LABELS: Record<string, string> = {
   FINISHED:         'Terminé',
@@ -53,6 +53,15 @@ const FORMAT_LABELS: Record<string, string> = {
   NOVEL:    'Light Novel',
   ONE_SHOT: 'One-shot',
 };
+
+const MONTHS_FR = [
+  'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
+] as const;
+
+// Regex compilées une seule fois au niveau module
+const RE_HTML    = /<[^>]*>/g;
+const RE_NEWLINE = /\n{3,}/g;
 
 const SEARCH_QUERY = `
   query ($search: String, $type: MediaType, $page: Int, $perPage: Int) {
@@ -118,46 +127,47 @@ export async function searchAniList(
     throw new Error(`AniList GraphQL error : ${json.errors[0]!.message}`);
   }
 
-  const { media } = json.data.Page;
-  const capped = media.slice(0, PER_PAGE);
+  const capped = json.data.Page.media.slice(0, PER_PAGE);
 
   return {
-    results: media,
+    results: capped,       // ✅ capped et non media brut
     total:   capped.length,
     hasNext: false,
     hasPrev: false,
   };
 }
 
+// ─── Helpers privés ──────────────────────────────────────────────────────────
+
+function parseColor(hex: string | null): number {
+  if (!hex) return Colors.Blurple;
+  const parsed = parseInt(hex.replace('#', ''), 16);
+  return isNaN(parsed) ? Colors.Blurple : parsed;
+}
+
 function formatDate(date: AniListMedia['startDate']): string {
-  if (!date.year) return 'Inconnue';
+  if (!date.year)  return 'Inconnue';
   if (!date.month) return `${date.year}`;
-  const d = new Date(date.year, date.month - 1, date.day ?? 1);
-  return d.toLocaleDateString('fr-FR', {
-    year:  'numeric',
-    month: 'long',
-    day:   date.day ? 'numeric' : undefined,
-  });
+  const month = MONTHS_FR[date.month - 1]!;
+  return date.day ? `${date.day} ${month} ${date.year}` : `${month} ${date.year}`;
 }
 
 function stripHtml(text: string): string {
-  return text.replace(/<[^>]*>/g, '').replace(/\n{3,}/g, '\n\n').trim();
+  return text.replace(RE_HTML, '').replace(RE_NEWLINE, '\n\n').trim();
 }
 
 function truncate(text: string, max: number): string {
   return text.length <= max ? text : text.slice(0, max - 1) + '…';
 }
 
+// ─── Embeds publics ──────────────────────────────────────────────────────────
+
 export function buildResultEmbed(
   media:       AniListMedia,
   globalIndex: number,
   total:       number,
 ): EmbedBuilder {
-  const title = media.title.english ?? media.title.romaji;
-  const color = media.coverImage.color
-    ? parseInt(media.coverImage.color.replace('#', ''), 16)
-    : Colors.Blurple;
-
+  const title       = media.title.english ?? media.title.romaji;
   const description = media.description
     ? truncate(stripHtml(media.description), 300)
     : '*Aucune description disponible.*';
@@ -218,15 +228,13 @@ export function buildResultEmbed(
   }
 
   return new EmbedBuilder()
-    .setColor(color)
+    .setColor(parseColor(media.coverImage.color))
     .setTitle(truncate(title, 256))
     .setURL(media.siteUrl)
     .setDescription(description)
     .setThumbnail(media.coverImage.extraLarge)
     .addFields(fields)
-    .setFooter({
-      text: `Résultat ${globalIndex}/${total} · AniList`,
-    })
+    .setFooter({ text: `Résultat ${globalIndex}/${total} · AniList` })
     .setTimestamp();
 }
 
