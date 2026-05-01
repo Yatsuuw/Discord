@@ -22,7 +22,6 @@ function timestamp() {
   return {
     time: now.toLocaleTimeString(),
     date: now.toISOString().split('T')[0]!,
-    instance: now,
   };
 }
 
