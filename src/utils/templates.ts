@@ -42,10 +42,12 @@ export const Templates = {
     const buttons = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder()
         .setCustomId('confirm')
+        .setEmoji('✅')
         .setLabel('Confirmer')
         .setStyle(ButtonStyle.Success),
       new ButtonBuilder()
         .setCustomId('cancel')
+        .setEmoji('❌')
         .setLabel('Annuler')
         .setStyle(ButtonStyle.Danger)
     );
