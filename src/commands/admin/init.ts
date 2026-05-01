@@ -2,6 +2,7 @@ import { ChatInputCommandInteraction, MessageFlags, PermissionFlagsBits, SlashCo
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
 import type { Command } from "../../types/index.js";
+import { logger } from "../../utils/logger.js";
 
 const command: Command = {
   data: new SlashCommandBuilder()
@@ -31,6 +32,7 @@ const command: Command = {
       });
       return;
     } catch (error) {
+      logger.error(`Erreur init du serveur ${guildId} :`, error);
       await interaction.reply({
         embeds: [Templates.error(`Erreur lors de l'initialisation du serveur : ${error}`)],
         flags: MessageFlags.Ephemeral
