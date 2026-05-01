@@ -53,7 +53,7 @@ export const DataManager = {
         where: { id_owner: { id: guildId, owner: ownerId } },
       });
     } catch (error) {
-      logger.error(`Erreir de lecture du serveur ${guildId} :`, error);
+      logger.error(`Erreur de lecture du serveur ${guildId} :`, error);
       throw error;
     }
   },
