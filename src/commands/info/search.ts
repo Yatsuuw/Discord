@@ -1,60 +1,22 @@
-import {
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ChatInputCommandInteraction,
-  ComponentType,
-  SlashCommandBuilder,
-} from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
 import type { Command } from '../../types/index.js';
-import {
-  searchAniList,
-  buildResultEmbed,
-  buildNoResultEmbed,
-  type MediaType,
-} from '../../utils/anilist.graphql_api.js';
+import { searchAniList, buildResultEmbed, buildNoResultEmbed, type MediaType } from '../../utils/anilist.graphql_api.js';
 import { Templates } from '../../utils/templates.js';
 import { logger } from '../../utils/logger.js';
 
 const COLLECTOR_TIMEOUT = 120_000;
 
+const ACTION_ROW = new ActionRowBuilder<ButtonBuilder>().addComponents(
+  new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Valider').setStyle(ButtonStyle.Success),
+  new ButtonBuilder().setCustomId('delete').setEmoji('🗑️').setLabel('Supprimer').setStyle(ButtonStyle.Danger),
+);
+
 function buildNavRow(isFirst: boolean, isLast: boolean): ActionRowBuilder<ButtonBuilder> {
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId('first')
-      .setEmoji('⏮️')
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(isFirst),
-    new ButtonBuilder()
-      .setCustomId('prev')
-      .setEmoji('◀️')
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(isFirst),
-    new ButtonBuilder()
-      .setCustomId('next')
-      .setEmoji('▶️')
-      .setStyle(ButtonStyle.Primary)
-      .setDisabled(isLast),
-    new ButtonBuilder()
-      .setCustomId('last')
-      .setEmoji('⏭️')
-      .setStyle(ButtonStyle.Secondary)
-      .setDisabled(isLast),
-  );
-}
-
-function buildActionRow(): ActionRowBuilder<ButtonBuilder> {
-  return new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder()
-      .setCustomId('confirm')
-      .setEmoji('✅')
-      .setLabel('Valider')
-      .setStyle(ButtonStyle.Success),
-    new ButtonBuilder()
-      .setCustomId('delete')
-      .setEmoji('🗑️')
-      .setLabel('Supprimer')
-      .setStyle(ButtonStyle.Danger),
+    new ButtonBuilder().setCustomId('first').setEmoji('⏮️').setStyle(ButtonStyle.Secondary).setDisabled(isFirst),
+    new ButtonBuilder().setCustomId('prev').setEmoji('◀️').setStyle(ButtonStyle.Primary).setDisabled(isFirst),
+    new ButtonBuilder().setCustomId('next').setEmoji('▶️').setStyle(ButtonStyle.Primary).setDisabled(isLast),
+    new ButtonBuilder().setCustomId('last').setEmoji('⏭️').setStyle(ButtonStyle.Secondary).setDisabled(isLast),
   );
 }
 
@@ -82,7 +44,7 @@ const command: Command = {
     ),
 
   async execute(interaction: ChatInputCommandInteraction) {
-    const type   = interaction.options.getString('type', true) as MediaType;
+    const type = interaction.options.getString('type', true) as MediaType;
     const search = interaction.options.getString('nom',  true).trim();
 
     await interaction.deferReply();
@@ -105,22 +67,22 @@ const command: Command = {
     }
 
     const results = pageData.results;
-    const total   = pageData.total;
-    let   index   = 0;
+    const total = pageData.total;
+    let index = 0;
 
-    const isFirst  = () => index === 0;
-    const isLast   = () => index === results.length - 1;
+    const isFirst = () => index === 0;
+    const isLast = () => index === results.length - 1;
     const position = () => index + 1;
 
     const message = await interaction.editReply({
-      embeds:     [buildResultEmbed(results[0]!, position(), total)],
-      components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
+      embeds: [buildResultEmbed(results[0]!, position(), total)],
+      components: [buildNavRow(isFirst(), isLast()), ACTION_ROW],
     });
 
     const collector = message.createMessageComponentCollector({
       componentType: ComponentType.Button,
-      filter:        (i) => i.user.id === interaction.user.id,
-      time:          COLLECTOR_TIMEOUT,
+      filter: (i) => i.user.id === interaction.user.id,
+      time: COLLECTOR_TIMEOUT,
     });
 
     collector.on('collect', async (btn) => {
@@ -140,24 +102,24 @@ const command: Command = {
         }
 
         switch (btn.customId) {
-          case 'next':  if (!isLast())  index++; break;
-          case 'prev':  if (!isFirst()) index--; break;
+          case 'next': if (!isLast()) index++; break;
+          case 'prev': if (!isFirst()) index--; break;
           case 'first': index = 0; break;
-          case 'last':  index = results.length - 1; break;
+          case 'last': index = results.length - 1; break;
         }
 
         const media = results[index];
         if (!media) return;
 
         await btn.editReply({
-          embeds:     [buildResultEmbed(media, position(), total)],
-          components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
+          embeds: [buildResultEmbed(media, position(), total)],
+          components: [buildNavRow(isFirst(), isLast()), ACTION_ROW],
         });
 
       } catch (err) {
         logger.error('Erreur navigation /search :', err);
         await btn.editReply({
-          embeds:     [Templates.error('Une erreur est survenue lors de la navigation.')],
+          embeds: [Templates.error('Une erreur est survenue lors de la navigation.')],
           components: [],
         });
       }
