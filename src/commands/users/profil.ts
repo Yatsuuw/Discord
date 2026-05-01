@@ -17,8 +17,8 @@ export const command = {
         )
     )
     .addUserOption(option =>
-      option.setName('utilisateur')
-        .setDescription('L\'utilisateur dont vous voulez voir le profil')
+      option.setName('membre')
+        .setDescription('Le membre dont vous voulez voir le profil')
         .setRequired(false)
     ),
     async execute(interaction: ChatInputCommandInteraction) {
