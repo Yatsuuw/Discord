@@ -19,14 +19,18 @@ export const DataManager = {
 
   async upsertUser(userId: string, profiles: Partial<UserProfiles>) {
     try {
-      const mal = profiles.mal ?? null;
-      const al = profiles.al ?? null;
-      const mc = profiles.mc ?? null;
-
       return await db.users.upsert({
         where: { user: userId },
-        update: { mal_username: mal, al_username: al, mangacollec: mc },
-        create: { user: userId, mal_username: mal, al_username: al, mangacollec: mc }
+        update: {
+          ...(profiles.mal !== undefined && { mal_username: profiles.mal }),
+          ...(profiles.al !== undefined && { al_username: profiles.al }),
+          ...(profiles.mc !== undefined && { mangacollec: profiles.mc }),
+        },
+        create: {
+          user: userId,
+          mal_username: profiles.mal ?? null,
+          al_username: profiles.al ?? null,
+          mangacollec: profiles.mc ?? null }
       });
     } catch (error) {
       logger.error(`Erreur de la mise à jour de l'utilisateur ${userId} :`, error);
