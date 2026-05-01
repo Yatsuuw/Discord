@@ -1,37 +1,11 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder, } from 'discord.js';
-import { searchAniList, buildResultEmbed, buildNoResultEmbed, } from '../../utils/anilist.graphql_api.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
+import { searchAniList, buildResultEmbed, buildNoResultEmbed } from '../../utils/anilist.graphql_api.js';
 import { Templates } from '../../utils/templates.js';
 import { logger } from '../../utils/logger.js';
 const COLLECTOR_TIMEOUT = 120_000;
+const ACTION_ROW = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Valider').setStyle(ButtonStyle.Success), new ButtonBuilder().setCustomId('delete').setEmoji('🗑️').setLabel('Supprimer').setStyle(ButtonStyle.Danger));
 function buildNavRow(isFirst, isLast) {
-    return new ActionRowBuilder().addComponents(new ButtonBuilder()
-        .setCustomId('first')
-        .setEmoji('⏮️')
-        .setStyle(ButtonStyle.Secondary)
-        .setDisabled(isFirst), new ButtonBuilder()
-        .setCustomId('prev')
-        .setEmoji('◀️')
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(isFirst), new ButtonBuilder()
-        .setCustomId('next')
-        .setEmoji('▶️')
-        .setStyle(ButtonStyle.Primary)
-        .setDisabled(isLast), new ButtonBuilder()
-        .setCustomId('last')
-        .setEmoji('⏭️')
-        .setStyle(ButtonStyle.Secondary)
-        .setDisabled(isLast));
-}
-function buildActionRow() {
-    return new ActionRowBuilder().addComponents(new ButtonBuilder()
-        .setCustomId('confirm')
-        .setEmoji('✅')
-        .setLabel('Valider')
-        .setStyle(ButtonStyle.Success), new ButtonBuilder()
-        .setCustomId('delete')
-        .setEmoji('🗑️')
-        .setLabel('Supprimer')
-        .setStyle(ButtonStyle.Danger));
+    return new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('first').setEmoji('⏮️').setStyle(ButtonStyle.Secondary).setDisabled(isFirst), new ButtonBuilder().setCustomId('prev').setEmoji('◀️').setStyle(ButtonStyle.Primary).setDisabled(isFirst), new ButtonBuilder().setCustomId('next').setEmoji('▶️').setStyle(ButtonStyle.Primary).setDisabled(isLast), new ButtonBuilder().setCustomId('last').setEmoji('⏭️').setStyle(ButtonStyle.Secondary).setDisabled(isLast));
 }
 const command = {
     data: new SlashCommandBuilder()
@@ -74,7 +48,7 @@ const command = {
         const position = () => index + 1;
         const message = await interaction.editReply({
             embeds: [buildResultEmbed(results[0], position(), total)],
-            components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
+            components: [buildNavRow(isFirst(), isLast()), ACTION_ROW],
         });
         const collector = message.createMessageComponentCollector({
             componentType: ComponentType.Button,
@@ -115,7 +89,7 @@ const command = {
                     return;
                 await btn.editReply({
                     embeds: [buildResultEmbed(media, position(), total)],
-                    components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
+                    components: [buildNavRow(isFirst(), isLast()), ACTION_ROW],
                 });
             }
             catch (err) {

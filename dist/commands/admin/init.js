@@ -1,6 +1,7 @@
 import { ChatInputCommandInteraction, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
+import { logger } from "../../utils/logger.js";
 const command = {
     data: new SlashCommandBuilder()
         .setName('init')
@@ -26,6 +27,7 @@ const command = {
             return;
         }
         catch (error) {
+            logger.error(`Erreur init du serveur ${guildId} :`, error);
             await interaction.reply({
                 embeds: [Templates.error(`Erreur lors de l'initialisation du serveur : ${error}`)],
                 flags: MessageFlags.Ephemeral

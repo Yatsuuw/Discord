@@ -1,10 +1,15 @@
-import { SlashCommandBuilder } from "discord.js";
+import { MessageFlags, SlashCommandBuilder } from "discord.js";
+import { Templates } from "../../utils/templates.js";
 const command = {
     data: new SlashCommandBuilder()
         .setName('ping')
         .setDescription('Répond avec Pong !'),
     async execute(interaction) {
-        await interaction.reply('Pong !');
+        const latency = Math.round(interaction.client.ws.ping);
+        await interaction.reply({
+            embeds: [Templates.success(`Pong ! 🏓 Latence : **${latency}ms**`)],
+            flags: MessageFlags.Ephemeral,
+        });
     }
 };
 export default command;
