@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from 'discord.js';
 import { DataManager } from '../../utils/dataManager.js';
 import { Templates } from '../../utils/templates.js';
-import { SITE_CONFIG } from './config_profil.js';
+import { SITE_CONFIG } from '../../utils/siteConfig.js';
 import { logger } from '../../utils/logger.js';
 const command = {
     data: new SlashCommandBuilder()
