@@ -12,7 +12,7 @@ const event: Event<Events.InteractionCreate> = {
 
     if (!command) {
       await interaction.reply({
-        content: 'Cette commande n\'existe pas.',
+        embeds: [Templates.error('Cette commande n\'existe pas ou a été désactivée.')],
         flags: MessageFlags.Ephemeral
       });
       return;
