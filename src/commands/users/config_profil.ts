@@ -41,7 +41,7 @@ export const command = {
 
         await DataManager.upsertUser(userId, mal, al, mc);
 
-        const siteName = site === 'mal' ? 'MyAnimeList' : site === 'al' ? 'AniList' : 'Mangacollec';
+        const siteName = site === 'mal' ? 'MyAnimeList' : site === 'al' ? 'AniList' : 'MangaCollec';
         const action = username === null ? 'supprimé' : 'enregistré';
 
         return interaction.reply({
