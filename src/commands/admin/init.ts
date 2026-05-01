@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { ChatInputCommandInteraction, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
 import { db } from "../../utils/database.js";
@@ -26,7 +26,7 @@ export const command = {
       if (existingServer) {
         return interaction.reply({
           embeds: [Templates.info('Information `/init` - Administration', [ { name: 'Retour de la base de données :', value: `Ce serveur est déjà enregistré dans la base de données.` } ])],
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
       }
 
@@ -38,7 +38,7 @@ export const command = {
     } catch (error) {
       return interaction.reply({
         embeds: [Templates.error(`Erreur lors de l'initialisation du serveur : ${error}`)],
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
     }
   }

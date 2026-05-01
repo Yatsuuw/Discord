@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
 
@@ -34,7 +34,7 @@ export const command = {
 
         return interaction.reply({
           embeds: [Templates.error(errorMsg)],
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
       }
 
@@ -67,7 +67,7 @@ export const command = {
 
         return interaction.reply({
           embeds: [Templates.error(errorMsg)],
-          ephemeral: true
+          flags: MessageFlags.Ephemeral
         });
       }
 

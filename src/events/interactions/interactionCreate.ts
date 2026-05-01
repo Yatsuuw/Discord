@@ -1,4 +1,4 @@
-import { EmbedBuilder, Events, type Interaction, Colors } from "discord.js";
+import { EmbedBuilder, Events, type Interaction, Colors, MessageFlags } from "discord.js";
 import type { Event } from "../../types/index.js";
 import { logger } from "../../utils/logger.js";
 
@@ -12,7 +12,7 @@ const event: Event<Events.InteractionCreate> = {
     if (!command) {
       await interaction.reply({
         content: 'Cette commande n\'existe pas.',
-        ephemeral: true
+        flags: MessageFlags.Ephemeral
       });
       return;
     }
@@ -29,9 +29,9 @@ const event: Event<Events.InteractionCreate> = {
         .setFooter({ text: `ID de l'erreur : ${Date.now()}` });
 
       if (interaction.replied || interaction.deferred) {
-        await interaction.followUp({ embeds: [errorEmbed], ephemeral: true });
+        await interaction.followUp({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
       } else {
-        await interaction.reply({ embeds: [errorEmbed], ephemeral: true });
+        await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
       }
     }
   }
