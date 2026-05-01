@@ -57,6 +57,7 @@ const MONTHS_FR = [
   'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
 ];
 
+// La query n'a plus besoin du paramètre $page — toujours page 1
 const SEARCH_QUERY = `
   query ($search: String, $type: MediaType, $perPage: Int) {
     Page(page: 1, perPage: $perPage) {
@@ -126,6 +127,8 @@ export async function searchAniList(
   };
 }
 
+// ── Helpers privés ────────────────────────────────────────────────────────────
+
 const RE_HTML    = /<[^>]*>/g;
 const RE_NEWLINE = /\n{3,}/g;
 
@@ -149,6 +152,8 @@ function formatDate(date: AniListMedia['startDate']): string {
   const month = MONTHS_FR[date.month - 1]!;
   return date.day ? `${date.day} ${month} ${date.year}` : `${month} ${date.year}`;
 }
+
+// ── Embeds publics ────────────────────────────────────────────────────────────
 
 export function buildResultEmbed(
   media: AniListMedia,
