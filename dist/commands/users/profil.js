@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
 export const command = {
@@ -22,7 +22,7 @@ export const command = {
                 : `L'utilisateur **${target.username}** n'a aucun profil enregistré.`;
             return interaction.reply({
                 embeds: [Templates.error(errorMsg)],
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         }
         let profileName = null;
@@ -51,7 +51,7 @@ export const command = {
                 : `**${target.username}** n'a pas lié son compte **${siteName}**.`;
             return interaction.reply({
                 embeds: [Templates.error(errorMsg)],
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         }
         const embed = Templates.info(`${siteName} - ${target.username}`, [

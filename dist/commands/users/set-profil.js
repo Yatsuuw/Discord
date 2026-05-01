@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
+import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from "discord.js";
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
 export const command = {
@@ -31,13 +31,13 @@ export const command = {
             const siteName = site === 'mal' ? 'MyAnimeList' : site === 'al' ? 'AniList' : 'Mangacollec';
             return interaction.reply({
                 embeds: [Templates.success(`Votre pseudo **${siteName}** a été enregistré avec succès.`)],
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         }
         catch (error) {
             return interaction.reply({
                 embeds: [Templates.error(`Une erreur est survenue lors de la mise à jour de votre profil : ${error}`)],
-                ephemeral: true
+                flags: MessageFlags.Ephemeral
             });
         }
     }
