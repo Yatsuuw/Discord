@@ -4,8 +4,6 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const logsDir = join(__dirname, '../../logs');
-const now = new Date().toLocaleTimeString();
-const date = new Date().toISOString().split('T')[0]!;
 
 const Colors = {
   Reset: "\x1b[0m",
@@ -19,8 +17,18 @@ if (!existsSync(logsDir)) {
   mkdirSync(logsDir, { recursive: true });
 }
 
+function timestamp() {
+  const now = new Date();
+  return {
+    time: now.toLocaleTimeString(),
+    date: now.toISOString().split('T')[0]!,
+    instance: now,
+  };
+}
+
 function writeToFile(level: string, message: string, error?: unknown): void {
-  let logMessage = `[${now}] [${level}] ${message}\n`;
+  const { time, date } = timestamp();
+  let logMessage = `[${time}] [${level}] ${message}\n`;
   if (error) logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
 
   appendFile(join(logsDir, `${date}.log`), logMessage, 'utf8', (err) => {
@@ -30,24 +38,24 @@ function writeToFile(level: string, message: string, error?: unknown): void {
 
 export const logger = {
   info: (message: string) => {
-    console.log(`${Colors.Green}[INFO]${Colors.Reset} [${now}] ${message}`);
+    console.log(`${Colors.Green}[INFO]${Colors.Reset} [${timestamp().time}] ${message}`);
     writeToFile('INFO', message);
   },
 
   warn: (message: string) => {
-    console.warn(`${Colors.Yellow}[WARN]${Colors.Reset} [${now}] ${message}`);
+    console.warn(`${Colors.Yellow}[WARN]${Colors.Reset} [${timestamp().time}] ${message}`);
     writeToFile('WARN', message);
   },
 
   error: (message: string, error?: unknown) => {
-    console.error(`${Colors.Red}[ERROR]${Colors.Reset} [${now}] ${message}`);
+    console.error(`${Colors.Red}[ERROR]${Colors.Reset} [${timestamp().time}] ${message}`);
     if (error) console.error(error);
     writeToFile('ERROR', message, error);
   },
 
   debug: (message: string) => {
     if (process.env.NODE_ENV !== 'production') {
-      console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${now}] ${message}`);
+      console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${timestamp().time}] ${message}`);
       writeToFile('DEBUG', message);
     }
   },
