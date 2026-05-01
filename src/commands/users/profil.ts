@@ -72,7 +72,7 @@ export const command = {
       }
 
       const embed = Templates.info(`${siteName} - ${target.username}`, [
-        { name: 'Lien du profil', value: `[${profileName}](${url})` }
+        { name: 'Lien du profil', value: `[Lien vers la page ${siteName}](${url})` }
       ]);
 
       embed.setThumbnail(target.displayAvatarURL({ size: 512 }));
