@@ -24,14 +24,12 @@ export interface AniListMedia {
 }
 
 export interface AniListPage {
-  results:  AniListMedia[];
-  total:    number;
-  hasNext:  boolean;
-  hasPrev:  boolean;
+  results: AniListMedia[];
+  total:   number;
 }
 
-const ANILIST_API      = 'https://graphql.anilist.co';
-export const PER_PAGE  = 10;
+const ANILIST_API     = 'https://graphql.anilist.co';
+export const PER_PAGE = 10;
 
 const STATUS_LABELS: Record<string, string> = {
   FINISHED:         'Terminé',
@@ -54,10 +52,15 @@ const FORMAT_LABELS: Record<string, string> = {
   ONE_SHOT: 'One-shot',
 };
 
+const MONTHS_FR = [
+  'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
+  'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
+];
+
 const SEARCH_QUERY = `
-  query ($search: String, $type: MediaType, $page: Int, $perPage: Int) {
-    Page(page: $page, perPage: $perPage) {
-      pageInfo { total hasNextPage }
+  query ($search: String, $type: MediaType, $perPage: Int) {
+    Page(page: 1, perPage: $perPage) {
+      pageInfo { total }
       media(search: $search, type: $type, sort: SEARCH_MATCH) {
         id
         title { romaji english native }
@@ -87,21 +90,21 @@ const SEARCH_QUERY = `
   }
 `;
 
+type AniListResponse = {
+  data:    { Page: { pageInfo: { total: number }; media: AniListMedia[] } };
+  errors?: { message: string }[];
+};
+
 export async function searchAniList(
   search: string,
   type:   MediaType,
-  page:   number = 1,
 ): Promise<AniListPage> {
-  if (page > 1) {
-    return { results: [], total: 0, hasNext: false, hasPrev: false };
-  }
-
   const response = await fetch(ANILIST_API, {
     method:  'POST',
     headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
     body:    JSON.stringify({
       query:     SEARCH_QUERY,
-      variables: { search, type, page: 1, perPage: PER_PAGE },
+      variables: { search, type, perPage: PER_PAGE },
     }),
   });
 
@@ -109,55 +112,50 @@ export async function searchAniList(
     throw new Error(`AniList API error : ${response.status} ${response.statusText}`);
   }
 
-  const json = await response.json() as {
-    data:    { Page: { pageInfo: { total: number; hasNextPage: boolean }; media: AniListMedia[] } };
-    errors?: { message: string }[];
-  };
+  const json = await response.json() as AniListResponse;
 
   if (json.errors?.length) {
     throw new Error(`AniList GraphQL error : ${json.errors[0]!.message}`);
   }
 
-  const { media } = json.data.Page;
-  const capped = media.slice(0, PER_PAGE);
+  const results = json.data.Page.media.slice(0, PER_PAGE);
 
   return {
-    results: media,
-    total:   capped.length,
-    hasNext: false,
-    hasPrev: false,
+    results,
+    total: results.length,
   };
 }
 
-function formatDate(date: AniListMedia['startDate']): string {
-  if (!date.year) return 'Inconnue';
-  if (!date.month) return `${date.year}`;
-  const d = new Date(date.year, date.month - 1, date.day ?? 1);
-  return d.toLocaleDateString('fr-FR', {
-    year:  'numeric',
-    month: 'long',
-    day:   date.day ? 'numeric' : undefined,
-  });
-}
+const RE_HTML    = /<[^>]*>/g;
+const RE_NEWLINE = /\n{3,}/g;
 
 function stripHtml(text: string): string {
-  return text.replace(/<[^>]*>/g, '').replace(/\n{3,}/g, '\n\n').trim();
+  return text.replace(RE_HTML, '').replace(RE_NEWLINE, '\n\n').trim();
 }
 
 function truncate(text: string, max: number): string {
   return text.length <= max ? text : text.slice(0, max - 1) + '…';
 }
 
-export function buildResultEmbed(
-  media:       AniListMedia,
-  globalIndex: number,
-  total:       number,
-): EmbedBuilder {
-  const title = media.title.english ?? media.title.romaji;
-  const color = media.coverImage.color
-    ? parseInt(media.coverImage.color.replace('#', ''), 16)
-    : Colors.Blurple;
+function parseColor(hex: string | null): number {
+  if (!hex) return Colors.Blurple;
+  const parsed = parseInt(hex.replace('#', ''), 16);
+  return isNaN(parsed) ? Colors.Blurple : parsed;
+}
 
+function formatDate(date: AniListMedia['startDate']): string {
+  if (!date.year)  return 'Inconnue';
+  if (!date.month) return `${date.year}`;
+  const month = MONTHS_FR[date.month - 1]!;
+  return date.day ? `${date.day} ${month} ${date.year}` : `${month} ${date.year}`;
+}
+
+export function buildResultEmbed(
+  media: AniListMedia,
+  index: number,
+  total: number,
+): EmbedBuilder {
+  const title       = media.title.english ?? media.title.romaji;
   const description = media.description
     ? truncate(stripHtml(media.description), 300)
     : '*Aucune description disponible.*';
@@ -189,11 +187,11 @@ export function buildResultEmbed(
     if (media.episodes) {
       fields.push({ name: '🎬 Épisodes', value: String(media.episodes), inline: true });
     }
-    const animStudios = media.studios.nodes
+    const studios = media.studios.nodes
       .filter(s => s.isAnimationStudio)
       .map(s => s.name);
-    if (animStudios.length) {
-      fields.push({ name: '🏢 Studio(s)', value: animStudios.join(', '), inline: true });
+    if (studios.length) {
+      fields.push({ name: '🏢 Studio(s)', value: studios.join(', '), inline: true });
     }
   }
 
@@ -218,15 +216,13 @@ export function buildResultEmbed(
   }
 
   return new EmbedBuilder()
-    .setColor(color)
+    .setColor(parseColor(media.coverImage.color))
     .setTitle(truncate(title, 256))
     .setURL(media.siteUrl)
     .setDescription(description)
     .setThumbnail(media.coverImage.extraLarge)
     .addFields(fields)
-    .setFooter({
-      text: `Résultat ${globalIndex}/${total} · AniList`,
-    })
+    .setFooter({ text: `Résultat ${index}/${total} · AniList` })
     .setTimestamp();
 }
 
