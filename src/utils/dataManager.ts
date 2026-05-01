@@ -14,10 +14,10 @@ export const DataManager = {
   async upsertUser(userId: string, mal: string | null, al: string | null, mc: string | null) {
     try {
       return await db.users.upsert({
-      where: { user: userId },
-      update: { mal_username: mal, al_username: al, mangacollec: mc },
-      create: { user: userId, mal_username: mal, al_username: al, mangacollec: mc }
-    });
+        where: { user: userId },
+        update: { mal_username: mal, al_username: al, mangacollec: mc },
+        create: { user: userId, mal_username: mal, al_username: al, mangacollec: mc }
+      });
     } catch (error) {
       logger.error(`Erreur de la mise à jour de l'utilisateur ${userId} :`, error);
       throw error;
