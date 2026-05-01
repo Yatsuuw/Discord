@@ -75,13 +75,11 @@ pnpm db:gen
 │   ├── config.ts         # Configuration centrale du bot
 │   ├── deploy.ts         # Script de déploiement vers l'API Discord
 │   └── index.ts          # Point d'entrée de l'application
-├── .env                  # Variables d'environnement (Token, IDs, DB URL)
 ├── .gitignore            # Fichiers et répertoires ignorés lors du déploiement
 ├── .npmrc                # Configuration du gestionnaire de paquets, rendre accessible Prisma à la racine de node_modules
 ├── eslint.config.js      # Configuration ESLint (Flat Config)
 ├── package.json          # Scripts pnpm et dépendances
 ├── pnpm-lock.yaml        # Configuration des versions des paquets et de leur intégrité
-├── pnpm-workspace.yaml   # Configuration des sous-paquets du projet
 ├── prisma.config.ts      # Fichier de configuration de Prisma
 └── tsconfig.json         # Configuration du compilateur TypeScript
 ```
@@ -92,7 +90,6 @@ pnpm db:gen
 | pnpm dev           | Lance le robot en mode développement avec `tsx watch`.                           |
 | pnpm deploy:local  | Déploie les commandes uniquement sur votre serveur de test.                      |
 | pnpm deploy:global | Déploie les commandes sur l'ensemble de l'API Discord.                           |
-| pnpm prebuild      | Supprimer le répertoire de compilation `/dist` avant la nouvelle compilation.    |
 | pnpm build         | Compile le projet en JavaScript dans le dossier `/dist`.                         |
 | pnpm start         | Lance le robot compilé en production.                                            |
 | pnpm db:pull       | Introspection de la base de données MariaDB.                                     |
