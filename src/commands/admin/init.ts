@@ -34,7 +34,7 @@ const command: Command = {
     } catch (error) {
       logger.error(`Erreur init du serveur ${guildId} :`, error);
       await interaction.reply({
-        embeds: [Templates.error(`Erreur lors de l'initialisation du serveur : ${error}`)],
+        embeds: [Templates.error(`Erreur lors de l'initialisation du serveur. Réessaie dans quelques instants.`)],
         flags: MessageFlags.Ephemeral
       });
       return;
