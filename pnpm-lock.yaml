@@ -20,9 +20,6 @@ importers:
       discord.js:
         specifier: ^14.26.3
         version: 14.26.3
-      dotenv:
-        specifier: ^17.4.2
-        version: 17.4.2
     devDependencies:
       '@eslint/js':
         specifier: ^10.0.1
