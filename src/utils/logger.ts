@@ -26,37 +26,42 @@ function timestamp() {
   };
 }
 
-function writeToFile(level: string, message: string, error?: unknown): void {
-  const { time, date } = timestamp();
-  let logMessage = `[${time}] [${level}] ${message}\n`;
+function writeToFile(level: string, message: string, error?: unknown, time?: string, date?: string): void {
+  const ts = time ?? timestamp().time;
+  const d = date ??  timestamp().date;
+  let logMessage = `[${ts}] [${level}] ${message}\n`;
   if (error) logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
 
-  appendFile(join(logsDir, `${date}.log`), logMessage, 'utf8', (err) => {
+  appendFile(join(logsDir, `${d}.log`), logMessage, 'utf8', (err) => {
     if (err) console.error('Échec d\'écriture du fichier :', err);
   });
 }
 
 export const logger = {
   info: (message: string) => {
-    console.log(`${Colors.Green}[INFO]${Colors.Reset} [${timestamp().time}] ${message}`);
-    writeToFile('INFO', message);
+    const { time, date } = timestamp();
+    console.log(`${Colors.Green}[INFO]${Colors.Reset} [${time}] ${message}`);
+    writeToFile('INFO', message, undefined, time, date);
   },
 
   warn: (message: string) => {
-    console.warn(`${Colors.Yellow}[WARN]${Colors.Reset} [${timestamp().time}] ${message}`);
-    writeToFile('WARN', message);
+    const { time, date } = timestamp();
+    console.warn(`${Colors.Yellow}[WARN]${Colors.Reset} [${time}] ${message}`);
+    writeToFile('WARN', message, undefined, time, date);
   },
 
   error: (message: string, error?: unknown) => {
-    console.error(`${Colors.Red}[ERROR]${Colors.Reset} [${timestamp().time}] ${message}`);
+    const { time, date } = timestamp();
+    console.error(`${Colors.Red}[ERROR]${Colors.Reset} [${time}] ${message}`);
     if (error) console.error(error);
-    writeToFile('ERROR', message, error);
+    writeToFile('ERROR', message, error, time, date);
   },
 
   debug: (message: string) => {
+    const { time, date } = timestamp();
     if (process.env.NODE_ENV !== 'production') {
-      console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${timestamp().time}] ${message}`);
-      writeToFile('DEBUG', message);
+      console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${time}] ${message}`);
+      writeToFile('DEBUG', message, undefined, time, date);
     }
   },
 };
