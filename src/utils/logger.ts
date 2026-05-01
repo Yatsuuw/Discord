@@ -24,7 +24,7 @@ function writeToFile(level: string, message: string, error?: unknown): void {
   if (error) logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
 
   appendFile(join(logsDir, `${date}.log`), logMessage, 'utf8', (err) => {
-    if (err) logger.error('Échec d\'écriture du fichier :', err);
+    if (err) console.error('Échec d\'écriture du fichier :', err);
   });
 }
 
