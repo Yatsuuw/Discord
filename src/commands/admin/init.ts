@@ -1,8 +1,9 @@
 import { ChatInputCommandInteraction, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
+import type { Command } from "../../types/index.js";
 
-export const command = {
+const command: Command = {
   data: new SlashCommandBuilder()
     .setName('init')
     .setDescription('Initialise le serveur dans la base de données')
@@ -16,22 +17,25 @@ export const command = {
       const existing = await DataManager.getServer(guildId, ownerId);
 
       if (existing) {
-        return interaction.reply({
+        await interaction.reply({
           embeds: [Templates.info('Serveur déjà enregistré', [ { name: 'Information', value: `Ce serveur est déjà enregistré dans la base de données.` } ])],
           flags: MessageFlags.Ephemeral
         });
+        return;
       }
 
       await DataManager.registerServer(guildId, ownerId);
 
-      return interaction.reply({
+      await interaction.reply({
         embeds: [Templates.success(`Le serveur **${name}** a été initialisé dans la base de données avec succès.`)]
       });
+      return;
     } catch (error) {
-      return interaction.reply({
+      await interaction.reply({
         embeds: [Templates.error(`Erreur lors de l'initialisation du serveur : ${error}`)],
         flags: MessageFlags.Ephemeral
       });
+      return;
     }
   }
 };
