@@ -15,22 +15,24 @@ export const command = {
     async execute(interaction) {
         const userId = interaction.user.id;
         const site = interaction.options.getString('site', true);
-        const username = interaction.options.getString('utilisateur', true);
+        const username = interaction.options.getString('nom', false);
         try {
             const current = await DataManager.getUser(userId);
             let mal = current?.mal_username ?? undefined;
             let al = current?.al_username ?? undefined;
             let mc = current?.mangacollec ?? undefined;
+            const newUsername = username ?? undefined;
             if (site === 'mal')
-                mal = username;
+                mal = newUsername;
             if (site === 'al')
-                al = username;
+                al = newUsername;
             if (site === 'mc')
-                mc = username;
+                mc = newUsername;
             await DataManager.upsertUser(userId, mal, al, mc);
             const siteName = site === 'mal' ? 'MyAnimeList' : site === 'al' ? 'AniList' : 'Mangacollec';
+            const action = username === null ? 'supprimé' : 'enregistré';
             return interaction.reply({
-                embeds: [Templates.success(`Votre pseudo **${siteName}** a été enregistré avec succès.`)],
+                embeds: [Templates.success(`Votre pseudo **${siteName}** a été ${action} avec succès.`)],
                 flags: MessageFlags.Ephemeral
             });
         }
