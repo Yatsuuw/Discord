@@ -71,6 +71,11 @@ export class ExtendedClient extends Client {
         const filePath = pathToFileURL(join(categoryPath, file)).href;
         const event: Event<keyof ClientEvents> = (await import(filePath)).default;
 
+        if (!event?.name || !event?.execute) {
+          logger.warn(`⚠️ Événement ignoré (export invalide) : ${file}`);
+          continue;
+        }
+
         if (event.once) {
           this.once(event.name, (...args) => event.execute(this, ...args));
         } else {
