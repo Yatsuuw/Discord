@@ -29,7 +29,7 @@ export class ExtendedClient extends Client {
       const categoryPath = join(commandsPath, category);
       if (!statSync(categoryPath).isDirectory()) continue;
 
-      const commandFiles = readdirSync(categoryPath).filter(f => f.endsWith('.js') || f.endsWith('.ts'));
+      const commandFiles = readdirSync(categoryPath).filter(f => f.endsWith('.js') || f.endsWith('.ts') && !f.endsWith('.d.ts'));
 
       for (const file of commandFiles) {
         const filePath = pathToFileURL(join(categoryPath, file)).href;
@@ -55,7 +55,7 @@ export class ExtendedClient extends Client {
       const categoryPath = join(eventsPath, category);
       if (!statSync(categoryPath).isDirectory()) continue;
 
-      const eventFiles = readdirSync(categoryPath).filter(f => f.endsWith('.js') || f.endsWith('.ts'));
+      const eventFiles = readdirSync(categoryPath).filter(f => f.endsWith('.js') || f.endsWith('.ts') && !f.endsWith('.d.ts'));
 
       for (const file of eventFiles) {
         const filePath = pathToFileURL(join(categoryPath, file)).href;
