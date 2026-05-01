@@ -23,7 +23,9 @@ function writeToFile(level: string, message: string, error?: unknown): void {
   let logMessage = `[${now.toLocaleTimeString()}] [${level}] ${message}\n`;
   if (error) logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
 
-  appendFile(join(logsDir, `${date}.log`), logMessage, 'utf8', () => {});
+  appendFile(join(logsDir, `${date}.log`), logMessage, 'utf8', (err) => {
+    if (err) logger.error('Échec d\'écriture du fichier :', err);
+  });
 }
 
 export const logger = {
