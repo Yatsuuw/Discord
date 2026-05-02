@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
 import type { Command } from '../../types/index.js';
-import { searchAniList, buildResultEmbed, buildNoResultEmbed, type MediaType } from '../../utils/anilist.graphql_api.js';
+import { searchAniList, buildResultEmbed, buildNoResultEmbed, type MediaType } from '../../utils/anilist/index.js';
 import { Templates } from '../../utils/templates.js';
 import { logger } from '../../utils/logger.js';
 
