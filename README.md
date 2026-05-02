@@ -53,6 +53,7 @@ pnpm db:gen
 |   |   ├── admin/
 |   |   |   └── init.ts
 |   |   ├── info/
+|   |   |   ├── search.ts
 |   |   |   └──ping.ts
 |   |   └── users/
 |   |   |   └── config_profil.ts
@@ -68,9 +69,15 @@ pnpm db:gen
 |   |   ├── discord.d.ts
 |   |   └── index.ts
 │   ├── utils/            # Utilitaires et modèles
+│   |   ├── anilist/      # Tout ce qui concerne l'API AniList
+|   |   |   ├── embeds.ts
+|   |   |   ├── index.ts
+|   |   |   ├── query.ts
+|   |   |   └── types.ts
 │   |   ├── database.ts
 │   |   ├── dataManager.ts
 │   |   ├── logger.ts
+│   |   ├── siteConfig.ts
 |   |   └── templates.ts
 │   ├── config.ts         # Configuration centrale du bot
 │   ├── deploy.ts         # Script de déploiement vers l'API Discord
