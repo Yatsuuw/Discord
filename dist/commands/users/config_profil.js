@@ -17,24 +17,28 @@ const command = {
     async execute(interaction) {
         const userId = interaction.user.id;
         const site = interaction.options.getString('site', true);
-        const username = interaction.options.getString('nom', false);
-        try {
-            await DataManager.upsertUser(userId, {
-                ...(site === 'mal' && { mal: username }),
-                ...(site === 'al' && { al: username }),
-                ...(site === 'mc' && { mc: username }),
+        const username = interaction.options.getString('nom', false) ?? null;
+        const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
+        if (!['mal', 'al', 'mc'].includes(site)) {
+            await interaction.reply({
+                embeds: [Templates.error('Site inconnu.', undefined, iconURL)],
+                flags: MessageFlags.Ephemeral,
             });
+            return;
+        }
+        try {
+            await DataManager.upsertUser(userId, { [site]: username });
             const siteName = SITE_CONFIG[site]?.label ?? site;
             const action = username === null ? 'supprimé' : 'enregistré';
             await interaction.reply({
-                embeds: [Templates.success(`Votre pseudo **${siteName}** a été ${action} avec succès.`, undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
+                embeds: [Templates.success(`Votre pseudo **${siteName}** a été ${action} avec succès.`, undefined, iconURL)],
                 flags: MessageFlags.Ephemeral,
             });
         }
         catch (error) {
             logger.error(`Erreur config_profil pour ${userId} :`, error);
             await interaction.reply({
-                embeds: [Templates.error('Une erreur est survenue lors de la mise à jour de votre profil.', undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
+                embeds: [Templates.error('Une erreur est survenue lors de la mise à jour de votre profil.', undefined, iconURL)],
                 flags: MessageFlags.Ephemeral,
             });
         }
