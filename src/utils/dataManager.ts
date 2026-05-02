@@ -39,7 +39,7 @@ export const DataManager = {
       return await db.servers.upsert({
         where: { id_owner: { id: guildId, owner: ownerId } },
         update: {},
-        create: { id: guildId, owner: ownerId } 
+        create: { id: guildId, owner: ownerId },
       });
     } catch (error) {
       logger.error(`Erreur d'enregistrement du serveur ${guildId} :`, error);
