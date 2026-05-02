@@ -73,10 +73,10 @@ export async function searchAniList(search, type) {
     if (json.errors?.length) {
         throw new Error(`AniList GraphQL error : ${json.errors[0].message}`);
     }
-    const results = json.data.Page.media.slice(0, PER_PAGE);
+    const results = json.data.Page.media;
     return {
         results,
-        total: results.length,
+        total: json.data.Page.pageInfo.total,
     };
 }
 // ── Helpers privés ────────────────────────────────────────────────────────────

@@ -3,6 +3,7 @@ import { logger } from "../../utils/logger.js";
 import { Templates } from "../../utils/templates.js";
 const event = {
     name: Events.InteractionCreate,
+    once: false,
     async execute(client, interaction) {
         if (!interaction.isChatInputCommand())
             return;

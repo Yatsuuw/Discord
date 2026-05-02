@@ -36,7 +36,7 @@ export const DataManager = {
         try {
             return await db.servers.upsert({
                 where: { id_owner: { id: guildId, owner: ownerId } },
-                update: {},
+                update: {}, // Serveur déjà enregistré, rien à modifier
                 create: { id: guildId, owner: ownerId }
             });
         }

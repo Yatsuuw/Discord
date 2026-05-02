@@ -18,18 +18,21 @@ function timestamp() {
     return {
         time: now.toLocaleTimeString(),
         date: now.toISOString().split('T')[0],
-        instance: now,
     };
 }
 function writeToFile(level, message, error, time, date) {
-    const ts = time ?? timestamp().time;
-    const d = date ?? timestamp().date;
+    let ts = time, d = date;
+    if (!ts || !d) {
+        const t = timestamp();
+        ts ??= t.time;
+        d ??= t.date;
+    }
     let logMessage = `[${ts}] [${level}] ${message}\n`;
     if (error)
         logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
     appendFile(join(logsDir, `${d}.log`), logMessage, 'utf8', (err) => {
         if (err)
-            console.error('Échec d\'écriture du fichier :', err);
+            console.error('[LOGGER] Échec d\'écriture du fichier :', err);
     });
 }
 export const logger = {
