@@ -31,7 +31,7 @@ const command: Command = {
 
     let userData;
     try {
-      userData = await DataManager.getUser(target.id).catch(() => null);
+      userData = await DataManager.getUser(target.id);
     } catch (error) {
       logger.error(`Une erreur est survenue lors de la récupération d'un profil.`, error)
       await interaction.reply({

@@ -1,11 +1,6 @@
+import type { UserProfiles } from "../types/index.js";
 import { db } from "./database.js";
 import { logger } from "./logger.js";
-
-interface UserProfiles {
-  mal?: string | null;
-  al?: string | null;
-  mc?: string | null;
-}
 
 export const DataManager = {
   async getUser(userId: string) {
@@ -42,7 +37,7 @@ export const DataManager = {
     try {
       return await db.servers.upsert({
         where: { id_owner: { id: guildId, owner: ownerId } },
-        update: {}, // Serveur déjà enregistré, rien à modifier
+        update: {},
         create: { id: guildId, owner: ownerId } 
     });
     } catch (error) {
