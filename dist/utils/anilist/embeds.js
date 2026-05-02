@@ -1,6 +1,4 @@
 import { EmbedBuilder, Colors } from 'discord.js';
-const ANILIST_API = 'https://graphql.anilist.co';
-export const PER_PAGE = 10;
 const STATUS_LABELS = {
     FINISHED: 'Terminé',
     RELEASING: 'En cours',
@@ -24,60 +22,6 @@ const MONTHS_FR = [
     'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
     'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
 ];
-const SEARCH_QUERY = `
-  query ($search: String, $type: MediaType, $perPage: Int) {
-    Page(page: 1, perPage: $perPage) {
-      pageInfo { total }
-      media(search: $search, type: $type, sort: SEARCH_MATCH) {
-        id
-        title { romaji english native }
-        type
-        format
-        status
-        description(asHtml: false)
-        episodes
-        chapters
-        volumes
-        averageScore
-        popularity
-        genres
-        siteUrl
-        coverImage { extraLarge color }
-        startDate { year month day }
-        endDate   { year month day }
-        studios   { nodes { name isAnimationStudio } }
-        staff(perPage: 4) {
-          edges {
-            role
-            node { name { full } }
-          }
-        }
-      }
-    }
-  }
-`;
-export async function searchAniList(search, type) {
-    const response = await fetch(ANILIST_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-            query: SEARCH_QUERY,
-            variables: { search, type, perPage: PER_PAGE },
-        }),
-    });
-    if (!response.ok) {
-        throw new Error(`AniList API error : ${response.status} ${response.statusText}`);
-    }
-    const json = await response.json();
-    if (json.errors?.length) {
-        throw new Error(`AniList GraphQL error : ${json.errors[0].message}`);
-    }
-    const results = json.data.Page.media;
-    return {
-        results,
-        total: json.data.Page.pageInfo.total,
-    };
-}
 const RE_HTML = /<[^>]*>/g;
 const RE_NEWLINE = /\n{3,}/g;
 function stripHtml(text) {
@@ -174,4 +118,4 @@ export function buildNoResultEmbed(search, type) {
         .setFooter({ text: 'AniList' })
         .setTimestamp();
 }
-//# sourceMappingURL=anilist.graphql_api.js.map
+//# sourceMappingURL=embeds.js.map

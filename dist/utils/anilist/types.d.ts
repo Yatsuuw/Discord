@@ -1,4 +1,3 @@
-import { EmbedBuilder } from 'discord.js';
 export type MediaType = 'ANIME' | 'MANGA';
 export interface AniListMedia {
     id: number;
@@ -53,8 +52,4 @@ export interface AniListPage {
     results: AniListMedia[];
     total: number;
 }
-export declare const PER_PAGE = 10;
-export declare function searchAniList(search: string, type: MediaType): Promise<AniListPage>;
-export declare function buildResultEmbed(media: AniListMedia, index: number, total: number): EmbedBuilder;
-export declare function buildNoResultEmbed(search: string, type: MediaType): EmbedBuilder;
-//# sourceMappingURL=anilist.graphql_api.d.ts.map
+//# sourceMappingURL=types.d.ts.map

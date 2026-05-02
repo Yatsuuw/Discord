@@ -1,5 +1,5 @@
 import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
-import { searchAniList, buildResultEmbed, buildNoResultEmbed } from '../../utils/anilist.graphql_api.js';
+import { searchAniList, buildResultEmbed, buildNoResultEmbed } from '../../utils/anilist/index.js';
 import { Templates } from '../../utils/templates.js';
 import { logger } from '../../utils/logger.js';
 const COLLECTOR_TIMEOUT = 120_000;
