@@ -54,11 +54,11 @@ export const logger = {
         writeToFile('ERROR', message, error, time, date);
     },
     debug: (message) => {
+        if (process.env.NODE_ENV === 'production')
+            return;
         const { time, date } = timestamp();
-        if (process.env.NODE_ENV !== 'production') {
-            console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${time}] ${message}`);
-            writeToFile('DEBUG', message, undefined, time, date);
-        }
+        console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${time}] ${message}`);
+        writeToFile('DEBUG', message, undefined, time, date);
     },
 };
 //# sourceMappingURL=logger.js.map

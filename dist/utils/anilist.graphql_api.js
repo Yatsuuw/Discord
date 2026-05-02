@@ -24,7 +24,6 @@ const MONTHS_FR = [
     'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
     'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
 ];
-// La query n'a plus besoin du paramètre $page — toujours page 1
 const SEARCH_QUERY = `
   query ($search: String, $type: MediaType, $perPage: Int) {
     Page(page: 1, perPage: $perPage) {
@@ -79,7 +78,6 @@ export async function searchAniList(search, type) {
         total: json.data.Page.pageInfo.total,
     };
 }
-// ── Helpers privés ────────────────────────────────────────────────────────────
 const RE_HTML = /<[^>]*>/g;
 const RE_NEWLINE = /\n{3,}/g;
 function stripHtml(text) {
@@ -91,7 +89,7 @@ function truncate(text, max) {
 function parseColor(hex) {
     if (!hex)
         return Colors.Blurple;
-    const parsed = parseInt(hex.replace('#', ''), 16);
+    const parsed = Number('0x' + hex.replace('#', ''));
     return isNaN(parsed) ? Colors.Blurple : parsed;
 }
 function formatDate(date) {
@@ -102,7 +100,6 @@ function formatDate(date) {
     const month = MONTHS_FR[date.month - 1];
     return date.day ? `${date.day} ${month} ${date.year}` : `${month} ${date.year}`;
 }
-// ── Embeds publics ────────────────────────────────────────────────────────────
 export function buildResultEmbed(media, index, total) {
     const title = media.title.english ?? media.title.romaji;
     const description = media.description
