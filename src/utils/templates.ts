@@ -1,10 +1,11 @@
 import { EmbedBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 
 type EmbedField = { name: string; value: string; inline?: boolean };
-type FooterOptions = { text: string; iconURL?: string };
+type FooterOptions = { text: string; iconURL?: string } | { text: string };
 
-function footer(text = 'Tsuyomi', iconURL?: string): FooterOptions {
-  return iconURL ? { text, iconURL } : { text };
+function footer(text: string = '', iconURL?: string): FooterOptions {
+  const t = text ? `Tsuyomi • ${text}` : 'Tsuyomi';
+  return iconURL ? { text: t, iconURL } : { text: t };
 }
 
 export const Templates = {
