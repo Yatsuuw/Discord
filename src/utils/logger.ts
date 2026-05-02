@@ -40,26 +40,26 @@ function writeToFile(level: string, message: string, error?: unknown): void {
 }
 
 export const logger = {
-  info: (message: string) => {
+  info: (message: string): void => {
     const { time } = timestamp();
     console.log(`${Colors.Green}[INFO]${Colors.Reset} [${time}] ${message}`);
     writeToFile('INFO', message);
   },
 
-  warn: (message: string) => {
+  warn: (message: string): void => {
     const { time } = timestamp();
     console.warn(`${Colors.Yellow}[WARN]${Colors.Reset} [${time}] ${message}`);
     writeToFile('WARN', message);
   },
 
-  error: (message: string, error?: unknown) => {
+  error: (message: string, error?: unknown): void => {
     const { time } = timestamp();
     console.error(`${Colors.Red}[ERROR]${Colors.Reset} [${time}] ${message}`);
     if (error) console.error(error);
     writeToFile('ERROR', message, error);
   },
 
-  debug: (message: string) => {
+  debug: (message: string): void => {
     if (process.env.NODE_ENV === 'production') return;
     const { time } = timestamp();
     console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${time}] ${message}`);
