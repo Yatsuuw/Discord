@@ -6,10 +6,12 @@ import { logger } from '../../utils/logger.js';
 
 const COLLECTOR_TIMEOUT = 120_000;
 
-const ACTION_ROW = new ActionRowBuilder<ButtonBuilder>().addComponents(
-  new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Valider').setStyle(ButtonStyle.Success),
-  new ButtonBuilder().setCustomId('delete').setEmoji('🗑️').setLabel('Supprimer').setStyle(ButtonStyle.Danger),
-);
+function buildActionRow(): ActionRowBuilder<ButtonBuilder> {
+  return new ActionRowBuilder<ButtonBuilder>().addComponents(
+    new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Valider').setStyle(ButtonStyle.Success),
+    new ButtonBuilder().setCustomId('delete').setEmoji('🗑️').setLabel('Supprimer').setStyle(ButtonStyle.Danger),
+  );
+}
 
 function buildNavRow(isFirst: boolean, isLast: boolean): ActionRowBuilder<ButtonBuilder> {
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
@@ -49,12 +51,11 @@ const command: Command = {
 
     await interaction.deferReply();
 
-    const pageData = await searchAniList(search, type).catch((err) => {
-      logger.error(`Erreur AniList /search "${search}" :`, err);
-      return null;
-    });
-
-    if (!pageData) {
+    let pageData;
+    try {
+      pageData = await searchAniList(search, type);
+    } catch (error) {
+      logger.error(`Erreur AniList /search "${search}" :`, error);
       await interaction.editReply({
         embeds: [Templates.error('Impossible de contacter l\'API AniList. Réessaye dans quelques instants.')],
       });
@@ -66,8 +67,7 @@ const command: Command = {
       return;
     }
 
-    const results = pageData.results;
-    const total = pageData.total;
+    const { results, total } = pageData;
     let index = 0;
 
     const isFirst = () => index === 0;
@@ -76,7 +76,7 @@ const command: Command = {
 
     const message = await interaction.editReply({
       embeds: [buildResultEmbed(results[0]!, position(), total)],
-      components: [buildNavRow(isFirst(), isLast()), ACTION_ROW],
+      components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
     });
 
     const collector = message.createMessageComponentCollector({
@@ -113,7 +113,7 @@ const command: Command = {
 
         await btn.editReply({
           embeds: [buildResultEmbed(media, position(), total)],
-          components: [buildNavRow(isFirst(), isLast()), ACTION_ROW],
+          components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
         });
 
       } catch (err) {
