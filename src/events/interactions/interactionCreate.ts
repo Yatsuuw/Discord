@@ -28,9 +28,9 @@ const event: Event<Events.InteractionCreate> = {
       const errorEmbed = Templates.error(`Une erreur interne empêche l'exécution de cette commande.`);
 
       if (interaction.replied || interaction.deferred) {
-        await interaction.followUp({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
+        await interaction.followUp({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral }).catch(() => {});
       } else {
-        await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral });
+        await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral }).catch(() => {});
       }
     }
   }
