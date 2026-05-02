@@ -18,9 +18,15 @@ if (!existsSync(logsDir)) {
 }
 
 function now() {
-  const iso = new Date().toISOString();
+  const now = new Date();
+  const iso = now.toISOString();
   const date = iso.slice(0, 10);
-  const time = iso.slice(11, 19);
+
+  const time = now.toLocaleTimeString('fr-FR', {
+    timeZone: 'Europe/Paris',
+    hour12: false,
+  });
+
   return { iso, date, time };
 }
 
