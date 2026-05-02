@@ -1,8 +1,20 @@
 export type MediaType = 'ANIME' | 'MANGA';
 
+export interface AniListTitle {
+  romaji: string;
+  english: string | null;
+  native: string;
+}
+
+export interface AniListDate {
+  year: number | null;
+  month: number | null;
+  day: number | null;
+}
+
 export interface AniListMedia {
   id: number;
-  title: { romaji: string; english: string | null; native: string };
+  title: AniListTitle;
   type: MediaType;
   format: string | null;
   status: string | null;
@@ -15,8 +27,8 @@ export interface AniListMedia {
   genres: string[];
   siteUrl: string;
   coverImage: { extraLarge: string; color: string | null };
-  startDate: { year: number | null; month: number | null; day: number | null };
-  endDate: { year: number | null; month: number | null; day: number | null };
+  startDate: AniListDate;
+  endDate: AniListDate;
   studios: { nodes: { name: string; isAnimationStudio: boolean }[] };
   staff: { edges: { role: string; node: { name: { full: string } } }[] };
 }
