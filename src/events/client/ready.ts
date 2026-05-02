@@ -9,7 +9,6 @@ function setPresence(client: import('discord.js').Client): void {
     activities: [{
       name: 'Regarde Laid Back Camp saison 3',
       type: ActivityType.Watching,
-      url: 'https://www.crunchyroll.com/fr/series/GRWEW95KR/laid-back-camp'
     }],
     status: 'online',
   });
