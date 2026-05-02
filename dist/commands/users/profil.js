@@ -19,7 +19,7 @@ const command = {
         const site = interaction.options.getString('site', true);
         let userData;
         try {
-            userData = await DataManager.getUser(target.id).catch(() => null);
+            userData = await DataManager.getUser(target.id);
         }
         catch (error) {
             logger.error(`Une erreur est survenue lors de la récupération d'un profil.`, error);

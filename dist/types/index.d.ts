@@ -12,4 +12,9 @@ export interface Event<Key extends keyof ClientEvents> {
     once?: boolean;
     execute: (client: ExtendedClient, ...args: ClientEvents[Key]) => Promise<void> | void;
 }
+export interface UserProfiles {
+    mal?: string | null;
+    al?: string | null;
+    mc?: string | null;
+}
 //# sourceMappingURL=index.d.ts.map

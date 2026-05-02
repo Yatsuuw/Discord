@@ -7,7 +7,7 @@ if (!rawUrl)
 const dbUrl = new URL(rawUrl);
 const adapter = new PrismaMariaDb({
     host: dbUrl.hostname,
-    port: Number(dbUrl.port) || 3306,
+    port: parseInt(dbUrl.port, 10) || 3306,
     user: dbUrl.username,
     password: dbUrl.password,
     database: dbUrl.pathname.slice(1),

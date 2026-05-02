@@ -1,8 +1,4 @@
-interface UserProfiles {
-    mal?: string | null;
-    al?: string | null;
-    mc?: string | null;
-}
+import type { UserProfiles } from "../types/index.js";
 export declare const DataManager: {
     getUser(userId: string): Promise<{
         user: string;
@@ -25,5 +21,4 @@ export declare const DataManager: {
         owner: string;
     } | null>;
 };
-export {};
 //# sourceMappingURL=dataManager.d.ts.map

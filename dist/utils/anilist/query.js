@@ -1,4 +1,5 @@
 const ANILIST_API = 'https://graphql.anilist.co';
+const REQUEST_TIMEOUT_MS = 8_000;
 export const PER_PAGE = 10;
 const SEARCH_QUERY = `
   query ($search: String, $type: MediaType, $perPage: Int) {
@@ -33,20 +34,35 @@ const SEARCH_QUERY = `
   }
 `;
 export async function searchAniList(search, type) {
-    const response = await fetch(ANILIST_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
-        body: JSON.stringify({
-            query: SEARCH_QUERY,
-            variables: { search, type, perPage: PER_PAGE },
-        }),
-    });
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS);
+    let response;
+    try {
+        response = await fetch(ANILIST_API, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+            body: JSON.stringify({ query: SEARCH_QUERY, variables: { search, type, perPage: PER_PAGE } }),
+            signal: controller.signal,
+        });
+    }
+    catch (err) {
+        const msg = err instanceof Error && err.name === 'AbortError'
+            ? `AniList API timeout après ${REQUEST_TIMEOUT_MS}ms`
+            : `AniList API injoignable`;
+        throw new Error(msg, { cause: err });
+    }
+    finally {
+        clearTimeout(timeout);
+    }
     if (!response.ok) {
         throw new Error(`AniList API error : ${response.status} ${response.statusText}`);
     }
     const json = await response.json();
     if (json.errors?.length) {
         throw new Error(`AniList GraphQL error : ${json.errors[0].message}`);
+    }
+    if (!json.data) {
+        throw new Error('AniList API : réponse vide ou inattendue');
     }
     return {
         results: json.data.Page.media,
