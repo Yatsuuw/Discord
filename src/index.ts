@@ -16,8 +16,8 @@ async function shutdown(label: string, reason: unknown): Promise<void> {
   process.exit(1);
 }
 
-process.on('unhandledRejection', (reason) => shutdown('Promesse non gérée', reason));
-process.on('uncaughtException', (err) => shutdown('Exception non capturée', err));
+process.on('unhandledRejection', (reason) => void shutdown('Promesse non gérée', reason));
+process.on('uncaughtException', (err) => void shutdown('Exception non capturée', err));
 
 (async () => {
   await connectDB();
