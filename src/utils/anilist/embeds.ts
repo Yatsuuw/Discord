@@ -1,7 +1,7 @@
 import { EmbedBuilder, Colors } from 'discord.js';
-import type { AniListMedia, MediaType } from './types.js';
+import type { AniListMedia, AniListDate, MediaType } from './types.js';
 
-const STATUS_LABELS: Record<string, string> = {
+const STATUS_LABELS: Readonly<Record<string, string>> = {
   FINISHED: 'Terminé',
   RELEASING: 'En cours',
   NOT_YET_RELEASED: 'À venir',
@@ -9,7 +9,7 @@ const STATUS_LABELS: Record<string, string> = {
   HIATUS: 'En pause',
 };
 
-const FORMAT_LABELS: Record<string, string> = {
+const FORMAT_LABELS: Readonly<Record<string, string>> = {
   TV: 'Série TV',
   TV_SHORT: 'Série courte',
   MOVIE: 'Film',
@@ -22,12 +22,14 @@ const FORMAT_LABELS: Record<string, string> = {
   ONE_SHOT: 'One-shot',
 };
 
-const MONTHS_FR = [
+const MONTHS_FR: Readonly<string[]> = [
   'janvier', 'février', 'mars', 'avril', 'mai', 'juin',
   'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre',
 ];
 
-const RE_HTML = /<[^>]*>/g;
+const AUTHOR_ROLES = new Set(['Story & Art', 'Story', 'Art']);
+
+const RE_HTML    = /<[^>]*>/g;
 const RE_NEWLINE = /\n{3,}/g;
 
 function stripHtml(text: string): string {
@@ -35,33 +37,35 @@ function stripHtml(text: string): string {
 }
 
 function truncate(text: string, max: number): string {
-  return text.length <= max ? text : text.slice(0, max - 1) + '…';
+  return text.length <= max ? text : `${text.slice(0, max - 1)}…`;
 }
 
 function parseColor(hex: string | null): number {
   if (!hex) return Colors.Blurple;
-  const parsed = Number('0x' + hex.replace('#', ''));
-  return isNaN(parsed) ? Colors.Blurple : parsed;
+  const parsed = parseInt(hex.replace('#', ''), 16);
+  return Number.isNaN(parsed) ? Colors.Blurple : parsed;
 }
 
-function formatDate(date: AniListMedia['startDate']): string {
-  if (!date.year)  return 'Inconnue';
-  if (!date.month) return `${date.year}`;
+function formatDate(date: AniListDate): string {
+  if (!date.year) return 'Inconnue';
+  if (!date.month) return String(date.year);
   const month = MONTHS_FR[date.month - 1]!;
   return date.day ? `${date.day} ${month} ${date.year}` : `${month} ${date.year}`;
 }
+
+type EmbedField = { name: string; value: string; inline: boolean };
 
 export function buildResultEmbed(
   media: AniListMedia,
   index: number,
   total: number,
 ): EmbedBuilder {
-  const title = media.title.english ?? media.title.romaji;
+  const title = media.title.english ?? media.title.romaji ?? media.title.native;
   const description = media.description
     ? truncate(stripHtml(media.description), 300)
     : '*Aucune description disponible.*';
 
-  const fields: { name: string; value: string; inline: boolean }[] = [
+  const fields: EmbedField[] = [
     {
       name: '📋 Format',
       value: FORMAT_LABELS[media.format ?? ''] ?? media.format ?? 'Inconnu',
@@ -72,16 +76,8 @@ export function buildResultEmbed(
       value: STATUS_LABELS[media.status ?? ''] ?? media.status ?? 'Inconnu',
       inline: true,
     },
-    {
-      name: '📅 Début',
-      value: formatDate(media.startDate),
-      inline: true,
-    },
-    {
-      name: '🏁 Fin',
-      value: formatDate(media.endDate),
-      inline: true,
-    },
+    { name: '📅 Début', value: formatDate(media.startDate), inline: true },
+    { name: '🏁 Fin', value: formatDate(media.endDate),   inline: true },
   ];
 
   if (media.type === 'ANIME') {
@@ -101,7 +97,7 @@ export function buildResultEmbed(
     if (media.volumes) fields.push({ name: '📚 Volumes',   value: String(media.volumes),  inline: true });
 
     const authors = media.staff.edges
-      .filter(e => e.role === 'Story & Art' || e.role === 'Story' || e.role === 'Art')
+      .filter(e => AUTHOR_ROLES.has(e.role))
       .map(e => `${e.node.name.full} *(${e.role})*`);
     if (authors.length) {
       fields.push({ name: '✏️ Auteur(s)', value: authors.join('\n'), inline: false });
@@ -111,7 +107,6 @@ export function buildResultEmbed(
   if (media.averageScore) {
     fields.push({ name: '⭐ Score', value: `${media.averageScore}/100`, inline: true });
   }
-
   if (media.genres.length) {
     fields.push({ name: '🏷️ Genres', value: media.genres.slice(0, 5).join(', '), inline: false });
   }
@@ -128,10 +123,11 @@ export function buildResultEmbed(
 }
 
 export function buildNoResultEmbed(search: string, type: MediaType): EmbedBuilder {
+  const label = type === 'ANIME' ? 'animé' : 'manga';
   return new EmbedBuilder()
     .setColor(Colors.Red)
     .setTitle('❌ Aucun résultat')
-    .setDescription(`Aucun ${type === 'ANIME' ? 'animé' : 'manga'} trouvé pour **${search}**.`)
+    .setDescription(`Aucun ${label} trouvé pour **${search}**.`)
     .setFooter({ text: 'AniList' })
     .setTimestamp();
 }
