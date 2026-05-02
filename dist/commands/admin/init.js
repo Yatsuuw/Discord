@@ -22,7 +22,8 @@ const command = {
             }
             await DataManager.registerServer(guildId, ownerId);
             await interaction.reply({
-                embeds: [Templates.success(`Le serveur **${name}** a été initialisé dans la base de données avec succès.`)]
+                embeds: [Templates.success(`Le serveur **${name}** a été initialisé dans la base de données avec succès.`)],
+                flags: MessageFlags.Ephemeral,
             });
         }
         catch (error) {
