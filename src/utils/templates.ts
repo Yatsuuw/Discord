@@ -1,9 +1,6 @@
 import { EmbedBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 
-const REQUEST_ROW = new ActionRowBuilder<ButtonBuilder>().addComponents(
-  new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Confirmer').setStyle(ButtonStyle.Success),
-  new ButtonBuilder().setCustomId('cancel').setEmoji('❌').setLabel('Annuler').setStyle(ButtonStyle.Danger),
-);
+type EmbedField = { name: string; value: string; inline?: boolean };
 
 export const Templates = {
   success: (content: string) =>
@@ -30,21 +27,31 @@ export const Templates = {
       .setFooter({ text: "Tsuyomi" })
       .setTimestamp(),
 
-  info: (title: string, fields: { name: string, value: string, inline?: boolean }[]) =>
-    new EmbedBuilder()
+  info: (title: string, fields: EmbedField[], description?: string) => {
+    const embed = new EmbedBuilder()
       .setColor(Colors.Blurple)
       .setTitle(title)
-      .addFields(fields)
       .setFooter({ text: 'Tsuyomi' })
-      .setTimestamp(),
+      .setTimestamp();
+
+    if (description) embed.setDescription(description);
+    if (fields.length) embed.addFields(fields);
+
+    return embed;
+  },
 
   request: (title: string, description: string) => {
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Confirmer').setStyle(ButtonStyle.Success),
+      new ButtonBuilder().setCustomId('cancel').setEmoji('❌').setLabel('Annuler').setStyle(ButtonStyle.Danger),
+    );
+
     const embed = new EmbedBuilder()
       .setColor(Colors.Blue)
       .setTitle(`❓ ${title}`)
       .setDescription(description)
       .setFooter({ text: 'Action requise' });
 
-    return { embeds: [embed], components: [REQUEST_ROW] };
+    return { embeds: [embed], components: [row] };
   },
 };
