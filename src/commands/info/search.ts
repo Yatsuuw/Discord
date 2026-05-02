@@ -63,7 +63,7 @@ const command: Command = {
     }
 
     if (!pageData.results.length) {
-      await interaction.editReply({ embeds: [buildNoResultEmbed(search, type)] });
+      await interaction.editReply({ embeds: [buildNoResultEmbed(search, type, interaction.client.user.displayAvatarURL({ size: 32 }))] });
       return;
     }
 
@@ -75,7 +75,7 @@ const command: Command = {
     const position = () => index + 1;
 
     const message = await interaction.editReply({
-      embeds: [buildResultEmbed(results[0]!, position(), results.length)],
+      embeds: [buildResultEmbed(results[0]!, position(), results.length, interaction.client.user.displayAvatarURL({ size: 32 }))],
       components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
     });
 
@@ -112,7 +112,7 @@ const command: Command = {
         if (!media) return;
 
         await btn.editReply({
-          embeds: [buildResultEmbed(media, position(), results.length)],
+          embeds: [buildResultEmbed(media, position(), results.length, interaction.client.user.displayAvatarURL({ size: 32 }))],
           components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
         });
 
