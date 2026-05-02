@@ -11,7 +11,7 @@ const Colors = {
   Green: "\x1b[32m",
   Yellow: "\x1b[33m",
   Blue: "\x1b[34m",
-};
+} as const;
 
 if (!existsSync(logsDir)) {
   mkdirSync(logsDir, { recursive: true });
