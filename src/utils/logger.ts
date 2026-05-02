@@ -58,10 +58,9 @@ export const logger = {
   },
 
   debug: (message: string) => {
+    if (process.env.NODE_ENV === 'production') return;
     const { time, date } = timestamp();
-    if (process.env.NODE_ENV !== 'production') {
-      console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${time}] ${message}`);
-      writeToFile('DEBUG', message, undefined, time, date);
-    }
+    console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${time}] ${message}`);
+    writeToFile('DEBUG', message, undefined, time, date);
   },
 };
