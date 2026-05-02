@@ -5,8 +5,6 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const logsDir = join(__dirname, '../../logs');
 
-if (!existsSync(logsDir)) mkdirSync(logsDir, { recursive: true });
-
 const Colors = {
   Reset: "\x1b[0m",
   Red: "\x1b[31m",
