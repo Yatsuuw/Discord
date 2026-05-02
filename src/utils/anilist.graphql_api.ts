@@ -123,7 +123,7 @@ export async function searchAniList(
 
   return {
     results,
-    total: results.length,
+    total: json.data.Page.pageInfo.total,
   };
 }
 
