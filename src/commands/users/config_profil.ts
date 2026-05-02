@@ -27,16 +27,20 @@ const command: Command = {
 
   async execute(interaction: ChatInputCommandInteraction) {
     const userId   = interaction.user.id;
-    const site     = interaction.options.getString('site', true);
-    const username = interaction.options.getString('nom', false);
+    const site     = interaction.options.getString('site', true) as 'mal' | 'al' | 'mc';
+    const username = interaction.options.getString('nom', false) ?? null;
     const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
 
-    try {
-      await DataManager.upsertUser(userId, {
-        ...(site === 'mal' && { mal: username }),
-        ...(site === 'al'  && { al:  username }),
-        ...(site === 'mc'  && { mc:  username }),
+    if (!(['mal', 'al', 'mc'] as const).includes(site)) {
+      await interaction.reply({
+        embeds: [Templates.error('Site inconnu.', undefined, iconURL)],
+        flags: MessageFlags.Ephemeral,
       });
+      return;
+    }
+
+    try {
+      await DataManager.upsertUser(userId, { [site]: username });
 
       const siteName = SITE_CONFIG[site]?.label ?? site;
       const action   = username === null ? 'supprimé' : 'enregistré';
