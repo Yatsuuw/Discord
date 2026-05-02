@@ -25,7 +25,8 @@ export const DataManager = {
           user: userId,
           mal_username: profiles.mal ?? null,
           al_username: profiles.al ?? null,
-          mangacollec: profiles.mc ?? null }
+          mangacollec: profiles.mc ?? null,
+        }
       });
     } catch (error) {
       logger.error(`Erreur de la mise à jour de l'utilisateur ${userId} :`, error);
