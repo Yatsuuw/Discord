@@ -19,7 +19,7 @@ export class ExtendedClient extends Client {
   async start(): Promise<void> {
     await this.loadCommands();
     await this.loadEvents();
-    
+
     try {
       await this.login(config.token);
     } catch (error) {
