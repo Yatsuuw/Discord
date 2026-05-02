@@ -30,12 +30,14 @@ export class ExtendedClient extends Client {
             const categoryPath = join(basePath, category);
             if (!statSync(categoryPath).isDirectory())
                 continue;
-            const files = readdirSync(categoryPath).filter(f => (f.endsWith('.js') || f.endsWith('.ts')) && !f.endsWith('.d.ts'));
+            const files = readdirSync(categoryPath).filter(f => f.endsWith('.js') && !f.endsWith('.d.js'));
             for (const file of files) {
                 const filePath = pathToFileURL(join(categoryPath, file)).href;
                 const mod = (await import(filePath)).default;
                 if (mod)
                     modules.push(mod);
+                else
+                    logger.warn(`⚠️ Module ignoré (export default manquant) : ${file}`);
             }
         }
         return modules;
@@ -44,7 +46,7 @@ export class ExtendedClient extends Client {
         const commands = await this.loadModules(join(__dirname, '../commands'));
         for (const command of commands) {
             if (!command.data || !command.execute) {
-                logger.warn(`⚠️ Commande ignorée (export invalide)`);
+                logger.warn(`⚠️ Commande ignorée (export invalide) : ${command.data?.name ?? 'inconnue'}`);
                 continue;
             }
             this.commands.set(command.data.name, command);
@@ -55,7 +57,7 @@ export class ExtendedClient extends Client {
         const events = await this.loadModules(join(__dirname, '../events'));
         for (const event of events) {
             if (!event.name || !event.execute) {
-                logger.warn(`⚠️ Événement ignoré (export invalide)`);
+                logger.warn(`⚠️ Événement ignoré (export invalide) : ${String(event.name ?? 'inconnu')}`);
                 continue;
             }
             if (event.once) {

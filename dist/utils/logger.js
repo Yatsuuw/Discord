@@ -1,8 +1,10 @@
-import { appendFile, existsSync, mkdirSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const logsDir = join(__dirname, '../../logs');
+if (!existsSync(logsDir))
+    mkdirSync(logsDir, { recursive: true });
 const Colors = {
     Reset: "\x1b[0m",
     Red: "\x1b[31m",
@@ -13,52 +15,48 @@ const Colors = {
 if (!existsSync(logsDir)) {
     mkdirSync(logsDir, { recursive: true });
 }
-function timestamp() {
-    const now = new Date();
-    return {
-        time: now.toLocaleTimeString(),
-        date: now.toISOString().split('T')[0],
-    };
+function now() {
+    const iso = new Date().toISOString();
+    const date = iso.slice(0, 10);
+    const time = iso.slice(11, 19);
+    return { iso, date, time };
 }
-function writeToFile(level, message, error, time, date) {
-    let ts = time, d = date;
-    if (!ts || !d) {
-        const t = timestamp();
-        ts ??= t.time;
-        d ??= t.date;
-    }
-    let logMessage = `[${ts}] [${level}] ${message}\n`;
+function writeToFile(level, message, error) {
+    const { date, time } = now();
+    let logMessage = `[${time}] [${level}] ${message}\n`;
     if (error)
         logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
-    appendFile(join(logsDir, `${d}.log`), logMessage, 'utf8', (err) => {
-        if (err)
-            console.error('[LOGGER] Échec d\'écriture du fichier :', err);
-    });
+    try {
+        appendFileSync(join(logsDir, `${date}.log`), logMessage, 'utf8');
+    }
+    catch (error) {
+        console.error('[LOGGER] Échec de l\'écriture dans le fichier :', error);
+    }
 }
 export const logger = {
     info: (message) => {
-        const { time, date } = timestamp();
+        const { time } = now();
         console.log(`${Colors.Green}[INFO]${Colors.Reset} [${time}] ${message}`);
-        writeToFile('INFO', message, undefined, time, date);
+        writeToFile('INFO', message);
     },
     warn: (message) => {
-        const { time, date } = timestamp();
+        const { time } = now();
         console.warn(`${Colors.Yellow}[WARN]${Colors.Reset} [${time}] ${message}`);
-        writeToFile('WARN', message, undefined, time, date);
+        writeToFile('WARN', message);
     },
     error: (message, error) => {
-        const { time, date } = timestamp();
+        const { time } = now();
         console.error(`${Colors.Red}[ERROR]${Colors.Reset} [${time}] ${message}`);
         if (error)
             console.error(error);
-        writeToFile('ERROR', message, error, time, date);
+        writeToFile('ERROR', message, error);
     },
     debug: (message) => {
         if (process.env.NODE_ENV === 'production')
             return;
-        const { time, date } = timestamp();
+        const { time } = now();
         console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${time}] ${message}`);
-        writeToFile('DEBUG', message, undefined, time, date);
+        writeToFile('DEBUG', message);
     },
 };
 //# sourceMappingURL=logger.js.map

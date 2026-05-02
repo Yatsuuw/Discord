@@ -24,7 +24,6 @@ const command = {
             await interaction.reply({
                 embeds: [Templates.success(`Le serveur **${name}** a été initialisé dans la base de données avec succès.`)]
             });
-            return;
         }
         catch (error) {
             logger.error(`Erreur init du serveur ${guildId} :`, error);
@@ -32,7 +31,6 @@ const command = {
                 embeds: [Templates.error(`Erreur lors de l'initialisation du serveur. Réessaie dans quelques instants.`)],
                 flags: MessageFlags.Ephemeral
             });
-            return;
         }
     }
 };
