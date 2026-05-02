@@ -67,7 +67,7 @@ const command: Command = {
       return;
     }
 
-    const { results, total } = pageData;
+    const { results } = pageData;
     let index = 0;
 
     const isFirst = () => index === 0;
@@ -75,7 +75,7 @@ const command: Command = {
     const position = () => index + 1;
 
     const message = await interaction.editReply({
-      embeds: [buildResultEmbed(results[0]!, position(), total)],
+      embeds: [buildResultEmbed(results[0]!, position(), results.length)],
       components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
     });
 
@@ -112,7 +112,7 @@ const command: Command = {
         if (!media) return;
 
         await btn.editReply({
-          embeds: [buildResultEmbed(media, position(), total)],
+          embeds: [buildResultEmbed(media, position(), results.length)],
           components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
         });
 

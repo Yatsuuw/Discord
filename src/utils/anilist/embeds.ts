@@ -58,7 +58,7 @@ type EmbedField = { name: string; value: string; inline: boolean };
 export function buildResultEmbed(
   media: AniListMedia,
   index: number,
-  total: number,
+  count: number,
 ): EmbedBuilder {
   const title = media.title.english ?? media.title.romaji ?? media.title.native;
   const description = media.description
@@ -118,7 +118,7 @@ export function buildResultEmbed(
     .setDescription(description)
     .setThumbnail(media.coverImage.extraLarge)
     .addFields(fields)
-    .setFooter({ text: `Résultat ${index}/${total} · AniList` })
+    .setFooter({ text: `Résultat ${index}/${count} · AniList` })
     .setTimestamp();
 }
 

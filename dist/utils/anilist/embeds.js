@@ -45,7 +45,7 @@ function formatDate(date) {
     const month = MONTHS_FR[date.month - 1];
     return date.day ? `${date.day} ${month} ${date.year}` : `${month} ${date.year}`;
 }
-export function buildResultEmbed(media, index, total) {
+export function buildResultEmbed(media, index, count) {
     const title = media.title.english ?? media.title.romaji ?? media.title.native;
     const description = media.description
         ? truncate(stripHtml(media.description), 300)
@@ -100,7 +100,7 @@ export function buildResultEmbed(media, index, total) {
         .setDescription(description)
         .setThumbnail(media.coverImage.extraLarge)
         .addFields(fields)
-        .setFooter({ text: `Résultat ${index}/${total} · AniList` })
+        .setFooter({ text: `Résultat ${index}/${count} · AniList` })
         .setTimestamp();
 }
 export function buildNoResultEmbed(search, type) {
