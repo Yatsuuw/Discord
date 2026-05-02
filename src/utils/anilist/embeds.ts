@@ -53,12 +53,18 @@ function formatDate(date: AniListDate): string {
   return date.day ? `${date.day} ${month} ${date.year}` : `${month} ${date.year}`;
 }
 
+function footer(text: string, iconURL?: string): { text: string; iconURL: string } | { text: string } {
+  const t = 'Tsuyomi • ' + text;
+  return iconURL ? { text: t, iconURL } : { text: t };
+}
+
 type EmbedField = { name: string; value: string; inline: boolean };
 
 export function buildResultEmbed(
   media: AniListMedia,
   index: number,
   count: number,
+  iconURL?: string,
 ): EmbedBuilder {
   const title = media.title.english ?? media.title.romaji ?? media.title.native;
   const description = media.description
@@ -118,16 +124,16 @@ export function buildResultEmbed(
     .setDescription(description)
     .setThumbnail(media.coverImage.extraLarge)
     .addFields(fields)
-    .setFooter({ text: `Résultat ${index}/${count} · AniList` })
+    .setFooter(footer(`Résultat ${index}/${count} · AniList`, iconURL))
     .setTimestamp();
 }
 
-export function buildNoResultEmbed(search: string, type: MediaType): EmbedBuilder {
+export function buildNoResultEmbed(search: string, type: MediaType, iconURL?: string): EmbedBuilder {
   const label = type === 'ANIME' ? 'animé' : 'manga';
   return new EmbedBuilder()
     .setColor(Colors.Red)
     .setTitle('❌ Aucun résultat')
     .setDescription(`Aucun ${label} trouvé pour **${search}**.`)
-    .setFooter({ text: 'AniList' })
+    .setFooter(footer('AniList', iconURL))
     .setTimestamp();
 }
