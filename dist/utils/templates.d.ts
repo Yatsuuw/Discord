@@ -5,11 +5,11 @@ type EmbedField = {
     inline?: boolean;
 };
 export declare const Templates: {
-    success: (content: string) => EmbedBuilder;
-    error: (content: string) => EmbedBuilder;
-    warning: (description: string) => EmbedBuilder;
-    info: (title: string, fields: EmbedField[], description?: string) => EmbedBuilder;
-    request: (title: string, description: string) => {
+    success: (content: string, footerText?: string, iconURL?: string) => EmbedBuilder;
+    error: (content: string, footerText?: string, iconURL?: string) => EmbedBuilder;
+    warning: (description: string, footerText?: string, iconURL?: string) => EmbedBuilder;
+    info: (title: string, fields: EmbedField[], description?: string, footerText?: string, iconURL?: string) => EmbedBuilder;
+    request: (title: string, description: string, footerText?: string, iconURL?: string) => {
         embeds: EmbedBuilder[];
         components: ActionRowBuilder<ButtonBuilder>[];
     };

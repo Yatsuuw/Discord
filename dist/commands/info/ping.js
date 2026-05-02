@@ -7,7 +7,7 @@ const command = {
     async execute(interaction) {
         const latency = Math.round(interaction.client.ws.ping);
         await interaction.reply({
-            embeds: [Templates.success(`Pong ! 🏓 Latence : **${latency}ms**`)],
+            embeds: [Templates.success(`Pong ! 🏓 Latence : **${latency}ms**`, undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
             flags: MessageFlags.Ephemeral,
         });
     }

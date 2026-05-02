@@ -1,28 +1,31 @@
 import { EmbedBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
+function footer(text = 'Tsuyomi', iconURL) {
+    return iconURL ? { text, iconURL } : { text };
+}
 export const Templates = {
-    success: (content) => new EmbedBuilder()
+    success: (content, footerText, iconURL) => new EmbedBuilder()
         .setColor(Colors.Green)
         .setTitle('✅ Opération réussie')
         .setDescription(content)
-        .setFooter({ text: "Tsuyomi" })
+        .setFooter(footer(footerText, iconURL))
         .setTimestamp(),
-    error: (content) => new EmbedBuilder()
+    error: (content, footerText, iconURL) => new EmbedBuilder()
         .setColor(Colors.Red)
         .setTitle('❌ Erreur')
         .setDescription(content)
-        .setFooter({ text: "Tsuyomi" })
+        .setFooter(footer(footerText, iconURL))
         .setTimestamp(),
-    warning: (description) => new EmbedBuilder()
+    warning: (description, footerText, iconURL) => new EmbedBuilder()
         .setColor(Colors.Yellow)
         .setTitle('⚠️ Avertissement')
         .setDescription(description)
-        .setFooter({ text: "Tsuyomi" })
+        .setFooter(footer(footerText, iconURL))
         .setTimestamp(),
-    info: (title, fields, description) => {
+    info: (title, fields, description, footerText, iconURL) => {
         const embed = new EmbedBuilder()
             .setColor(Colors.Blurple)
             .setTitle(title)
-            .setFooter({ text: 'Tsuyomi' })
+            .setFooter(footer(footerText, iconURL))
             .setTimestamp();
         if (description)
             embed.setDescription(description);
@@ -30,13 +33,13 @@ export const Templates = {
             embed.addFields(fields);
         return embed;
     },
-    request: (title, description) => {
+    request: (title, description, footerText, iconURL) => {
         const row = new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Confirmer').setStyle(ButtonStyle.Success), new ButtonBuilder().setCustomId('cancel').setEmoji('❌').setLabel('Annuler').setStyle(ButtonStyle.Danger));
         const embed = new EmbedBuilder()
             .setColor(Colors.Blue)
             .setTitle(`❓ ${title}`)
             .setDescription(description)
-            .setFooter({ text: 'Action requise' });
+            .setFooter(footer(footerText, iconURL));
         return { embeds: [embed], components: [row] };
     },
 };

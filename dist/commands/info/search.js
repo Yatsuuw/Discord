@@ -35,7 +35,7 @@ const command = {
         catch (error) {
             logger.error(`Erreur AniList /search "${search}" :`, error);
             await interaction.editReply({
-                embeds: [Templates.error('Impossible de contacter l\'API AniList. Réessaye dans quelques instants.')],
+                embeds: [Templates.error('Impossible de contacter l\'API AniList. Réessaye dans quelques instants.', undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
             });
             return;
         }
@@ -97,7 +97,7 @@ const command = {
             catch (err) {
                 logger.error('Erreur navigation /search :', err);
                 await btn.editReply({
-                    embeds: [Templates.error('Une erreur est survenue lors de la navigation.')],
+                    embeds: [Templates.error('Une erreur est survenue lors de la navigation.', undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
                     components: [],
                 });
             }

@@ -24,7 +24,7 @@ const command = {
         catch (error) {
             logger.error(`Une erreur est survenue lors de la récupération d'un profil.`, error);
             await interaction.reply({
-                embeds: [Templates.error('Erreur lors de la récupération du profil. Réessaie dans quelques instants.')],
+                embeds: [Templates.error('Erreur lors de la récupération du profil. Réessaie dans quelques instants.', undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
                 flags: MessageFlags.Ephemeral,
             });
             return;
@@ -33,7 +33,7 @@ const command = {
             const msg = target.id === interaction.user.id
                 ? 'Vous n\'avez aucun profil enregistré. Utilisez `/config_profil` pour l\'enregistrer !'
                 : `L'utilisateur **${target.username}** n'a aucun profil enregistré.`;
-            await interaction.reply({ embeds: [Templates.error(msg)], flags: MessageFlags.Ephemeral });
+            await interaction.reply({ embeds: [Templates.error(msg, undefined, interaction.client.user.displayAvatarURL({ size: 32 }))], flags: MessageFlags.Ephemeral });
             return;
         }
         const siteConfig = SITE_CONFIG[site];
@@ -44,13 +44,13 @@ const command = {
             const msg = target.id === interaction.user.id
                 ? `Vous n'avez pas lié votre compte **${siteConfig.label}**.`
                 : `**${target.username}** n'a pas lié son compte **${siteConfig.label}**.`;
-            await interaction.reply({ embeds: [Templates.error(msg)], flags: MessageFlags.Ephemeral });
+            await interaction.reply({ embeds: [Templates.error(msg, undefined, interaction.client.user.displayAvatarURL({ size: 32 }))], flags: MessageFlags.Ephemeral });
             return;
         }
         const url = siteConfig.buildUrl(profileName);
         const embed = Templates.info(`${siteConfig.label} - ${target.username}`, [
             { name: 'Lien du profil', value: `[Lien vers la page ${siteConfig.label}](${url})` },
-        ]);
+        ], undefined, undefined, interaction.client.user.displayAvatarURL({ size: 32 }));
         embed.setThumbnail(target.displayAvatarURL({ size: 512 }));
         await interaction.reply({ embeds: [embed] });
     },
