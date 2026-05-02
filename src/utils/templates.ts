@@ -1,37 +1,42 @@
 import { EmbedBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 
 type EmbedField = { name: string; value: string; inline?: boolean };
+type FooterOptions = { text: string; iconURL?: string };
+
+function footer(text = 'Tsuyomi', iconURL?: string): FooterOptions {
+  return iconURL ? { text, iconURL } : { text };
+}
 
 export const Templates = {
-  success: (content: string) =>
+  success: (content: string, footerText?: string, iconURL?: string) =>
     new EmbedBuilder()
       .setColor(Colors.Green)
       .setTitle('✅ Opération réussie')
       .setDescription(content)
-      .setFooter({ text: "Tsuyomi" })
+      .setFooter(footer(footerText, iconURL))
       .setTimestamp(),
 
-  error: (content: string) =>
+  error: (content: string, footerText?: string, iconURL?: string) =>
     new EmbedBuilder()
       .setColor(Colors.Red)
       .setTitle('❌ Erreur')
       .setDescription(content)
-      .setFooter({ text: "Tsuyomi" })
+      .setFooter(footer(footerText, iconURL))
       .setTimestamp(),
 
-  warning: (description: string) =>
+  warning: (description: string, footerText?: string, iconURL?: string) =>
     new EmbedBuilder()
       .setColor(Colors.Yellow)
       .setTitle('⚠️ Avertissement')
       .setDescription(description)
-      .setFooter({ text: "Tsuyomi" })
+      .setFooter(footer(footerText, iconURL))
       .setTimestamp(),
 
-  info: (title: string, fields: EmbedField[], description?: string) => {
+  info: (title: string, fields: EmbedField[], description?: string, footerText?: string, iconURL?: string) => {
     const embed = new EmbedBuilder()
       .setColor(Colors.Blurple)
       .setTitle(title)
-      .setFooter({ text: 'Tsuyomi' })
+      .setFooter(footer(footerText, iconURL))
       .setTimestamp();
 
     if (description) embed.setDescription(description);
@@ -40,7 +45,7 @@ export const Templates = {
     return embed;
   },
 
-  request: (title: string, description: string) => {
+  request: (title: string, description: string, footerText?: string, iconURL?: string) => {
     const row = new ActionRowBuilder<ButtonBuilder>().addComponents(
       new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Confirmer').setStyle(ButtonStyle.Success),
       new ButtonBuilder().setCustomId('cancel').setEmoji('❌').setLabel('Annuler').setStyle(ButtonStyle.Danger),
@@ -50,7 +55,7 @@ export const Templates = {
       .setColor(Colors.Blue)
       .setTitle(`❓ ${title}`)
       .setDescription(description)
-      .setFooter({ text: 'Action requise' });
+      .setFooter(footer(footerText, iconURL));
 
     return { embeds: [embed], components: [row] };
   },
