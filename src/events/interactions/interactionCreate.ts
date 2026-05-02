@@ -5,6 +5,7 @@ import { Templates } from "../../utils/templates.js";
 
 const event: Event<Events.InteractionCreate> = {
   name: Events.InteractionCreate,
+  once: false,
   async execute(client, interaction: Interaction) {
     if (!interaction.isChatInputCommand()) return;
 
