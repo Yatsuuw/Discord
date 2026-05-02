@@ -2,7 +2,7 @@ import { ActivityType, Events } from "discord.js";
 import type { Event } from "../../types/index.js";
 import { logger } from "../../utils/logger.js";
 
-const PRESENCE_REFRESH_MS = 4 * 60 * 100;
+const PRESENCE_REFRESH_MS = 4 * 60 * 1_000;
 
 function setPresence(client: import('discord.js').Client): void {
   client.user?.setPresence({
