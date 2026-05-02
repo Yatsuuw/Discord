@@ -1,4 +1,4 @@
-import { appendFileSync, existsSync, mkdirSync } from 'node:fs';
+import { appendFileSync, mkdirSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -10,26 +10,23 @@ const Colors = {
     Yellow: "\x1b[33m",
     Blue: "\x1b[34m",
 };
-if (!existsSync(logsDir)) {
-    mkdirSync(logsDir, { recursive: true });
-}
 function timestamp() {
-    const now = new Date();
-    const iso = now.toISOString();
-    const date = iso.slice(0, 10);
-    const time = now.toLocaleTimeString('fr-FR', {
+    const d = new Date();
+    const day = d.toISOString().slice(0, 10);
+    const time = d.toLocaleTimeString('fr-FR', {
         timeZone: 'Europe/Paris',
         hour12: false,
     });
-    return { iso, date, time };
+    return { day, time };
 }
 function writeToFile(level, message, error) {
-    const { date, time } = timestamp();
+    const { day, time } = timestamp();
     let logMessage = `[${time}] [${level}] ${message}\n`;
     if (error)
         logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
     try {
-        appendFileSync(join(logsDir, `${date}.log`), logMessage, 'utf8');
+        mkdirSync(logsDir, { recursive: true });
+        appendFileSync(join(logsDir, `${day}.log`), logMessage, 'utf8');
     }
     catch (error) {
         console.error('[LOGGER] Échec de l\'écriture dans le fichier :', error);
