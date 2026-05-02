@@ -27,6 +27,7 @@ const command = {
     async execute(interaction) {
         const type = interaction.options.getString('type', true);
         const search = interaction.options.getString('nom', true).trim();
+        const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
         await interaction.deferReply();
         let pageData;
         try {
@@ -35,12 +36,12 @@ const command = {
         catch (error) {
             logger.error(`Erreur AniList /search "${search}" :`, error);
             await interaction.editReply({
-                embeds: [Templates.error('Impossible de contacter l\'API AniList. Réessaye dans quelques instants.', undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
+                embeds: [Templates.error('Impossible de contacter l\'API AniList. Réessaye dans quelques instants.', undefined, iconURL)],
             });
             return;
         }
         if (!pageData.results.length) {
-            await interaction.editReply({ embeds: [buildNoResultEmbed(search, type, interaction.client.user.displayAvatarURL({ size: 32 }))] });
+            await interaction.editReply({ embeds: [buildNoResultEmbed(search, type, iconURL)] });
             return;
         }
         const { results } = pageData;
@@ -49,7 +50,7 @@ const command = {
         const isLast = () => index === results.length - 1;
         const position = () => index + 1;
         const message = await interaction.editReply({
-            embeds: [buildResultEmbed(results[0], position(), results.length, interaction.client.user.displayAvatarURL({ size: 32 }))],
+            embeds: [buildResultEmbed(results[0], position(), results.length, iconURL)],
             components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
         });
         const collector = message.createMessageComponentCollector({
@@ -90,14 +91,14 @@ const command = {
                 if (!media)
                     return;
                 await btn.editReply({
-                    embeds: [buildResultEmbed(media, position(), results.length, interaction.client.user.displayAvatarURL({ size: 32 }))],
+                    embeds: [buildResultEmbed(media, position(), results.length, iconURL)],
                     components: [buildNavRow(isFirst(), isLast()), buildActionRow()],
                 });
             }
             catch (err) {
                 logger.error('Erreur navigation /search :', err);
                 await btn.editReply({
-                    embeds: [Templates.error('Une erreur est survenue lors de la navigation.', undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
+                    embeds: [Templates.error('Une erreur est survenue lors de la navigation.', undefined, iconURL)],
                     components: [],
                 });
             }
