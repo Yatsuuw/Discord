@@ -29,6 +29,7 @@ const command: Command = {
     const userId   = interaction.user.id;
     const site     = interaction.options.getString('site', true);
     const username = interaction.options.getString('nom', false);
+    const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
 
     try {
       await DataManager.upsertUser(userId, {
@@ -41,13 +42,13 @@ const command: Command = {
       const action   = username === null ? 'supprimé' : 'enregistré';
 
       await interaction.reply({
-        embeds: [Templates.success(`Votre pseudo **${siteName}** a été ${action} avec succès.`, undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
+        embeds: [Templates.success(`Votre pseudo **${siteName}** a été ${action} avec succès.`, undefined, iconURL)],
         flags:  MessageFlags.Ephemeral,
       });
     } catch (error) {
       logger.error(`Erreur config_profil pour ${userId} :`, error);
       await interaction.reply({
-        embeds: [Templates.error('Une erreur est survenue lors de la mise à jour de votre profil.', undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
+        embeds: [Templates.error('Une erreur est survenue lors de la mise à jour de votre profil.', undefined, iconURL)],
         flags:  MessageFlags.Ephemeral,
       });
     }
