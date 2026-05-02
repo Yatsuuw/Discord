@@ -13,7 +13,7 @@ const Colors = {
 if (!existsSync(logsDir)) {
     mkdirSync(logsDir, { recursive: true });
 }
-function now() {
+function timestamp() {
     const now = new Date();
     const iso = now.toISOString();
     const date = iso.slice(0, 10);
@@ -24,7 +24,7 @@ function now() {
     return { iso, date, time };
 }
 function writeToFile(level, message, error) {
-    const { date, time } = now();
+    const { date, time } = timestamp();
     let logMessage = `[${time}] [${level}] ${message}\n`;
     if (error)
         logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
@@ -37,17 +37,17 @@ function writeToFile(level, message, error) {
 }
 export const logger = {
     info: (message) => {
-        const { time } = now();
+        const { time } = timestamp();
         console.log(`${Colors.Green}[INFO]${Colors.Reset} [${time}] ${message}`);
         writeToFile('INFO', message);
     },
     warn: (message) => {
-        const { time } = now();
+        const { time } = timestamp();
         console.warn(`${Colors.Yellow}[WARN]${Colors.Reset} [${time}] ${message}`);
         writeToFile('WARN', message);
     },
     error: (message, error) => {
-        const { time } = now();
+        const { time } = timestamp();
         console.error(`${Colors.Red}[ERROR]${Colors.Reset} [${time}] ${message}`);
         if (error)
             console.error(error);
@@ -56,7 +56,7 @@ export const logger = {
     debug: (message) => {
         if (process.env.NODE_ENV === 'production')
             return;
-        const { time } = now();
+        const { time } = timestamp();
         console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${time}] ${message}`);
         writeToFile('DEBUG', message);
     },
