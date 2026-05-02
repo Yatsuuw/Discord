@@ -64,7 +64,7 @@ export class ExtendedClient extends Client {
     logger.info(`${this.commands.size} commandes chargées.`);
   }
 
-  private async loadEvents() {
+  private async loadEvents(): Promise<void> {
     const events = await this.loadModules<Event<keyof ClientEvents>>(join(__dirname, '../events'));
 
     for (const event of events) {
