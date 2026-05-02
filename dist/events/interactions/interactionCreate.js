@@ -9,7 +9,7 @@ const event = {
             return;
         const command = client.commands.get(interaction.commandName);
         if (!command) {
-            logger.warn(`Commande inconnue invoquée : /${interaction.commandName} par ${interaction.user.tag}`);
+            logger.warn(`Commande inconnue invoquée : /${interaction.commandName} par ${interaction.user.username}`);
             await interaction.reply({
                 embeds: [Templates.error('Cette commande n\'existe pas ou a été désactivée.')],
                 flags: MessageFlags.Ephemeral
