@@ -41,13 +41,13 @@ const command: Command = {
       const action   = username === null ? 'supprimé' : 'enregistré';
 
       await interaction.reply({
-        embeds: [Templates.success(`Votre pseudo **${siteName}** a été ${action} avec succès.`)],
+        embeds: [Templates.success(`Votre pseudo **${siteName}** a été ${action} avec succès.`, undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
         flags:  MessageFlags.Ephemeral,
       });
     } catch (error) {
       logger.error(`Erreur config_profil pour ${userId} :`, error);
       await interaction.reply({
-        embeds: [Templates.error('Une erreur est survenue lors de la mise à jour de votre profil.')],
+        embeds: [Templates.error('Une erreur est survenue lors de la mise à jour de votre profil.', undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
         flags:  MessageFlags.Ephemeral,
       });
     }

@@ -19,7 +19,7 @@ const command: Command = {
 
       if (existing) {
         await interaction.reply({
-          embeds: [Templates.info('Serveur déjà enregistré', [ { name: 'Information', value: `Ce serveur est déjà enregistré dans la base de données.` } ])],
+          embeds: [Templates.info('Serveur déjà enregistré', [ { name: 'Information', value: `Ce serveur est déjà enregistré dans la base de données.` } ], undefined, undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
           flags: MessageFlags.Ephemeral
         });
         return;
@@ -28,13 +28,13 @@ const command: Command = {
       await DataManager.registerServer(guildId, ownerId);
 
       await interaction.reply({
-        embeds: [Templates.success(`Le serveur **${name}** a été initialisé dans la base de données avec succès.`)],
+        embeds: [Templates.success(`Le serveur **${name}** a été initialisé dans la base de données avec succès.`, undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
         flags: MessageFlags.Ephemeral,
       });
     } catch (error) {
       logger.error(`Erreur init du serveur ${guildId} :`, error);
       await interaction.reply({
-        embeds: [Templates.error(`Erreur lors de l'initialisation du serveur. Réessaie dans quelques instants.`)],
+        embeds: [Templates.error(`Erreur lors de l'initialisation du serveur. Réessaie dans quelques instants.`, undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
         flags: MessageFlags.Ephemeral
       });
     }
