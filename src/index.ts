@@ -10,15 +10,16 @@ const client = new ExtendedClient({
   ]
 });
 
-(async () => {
-  await connectDB();
-  await client.start();
-})();
-
-function shutdown(label: string, reason: unknown): void {
+async function shutdown(label: string, reason: unknown): Promise<void> {
   logger.error(`${label} :`, reason);
-  db.$disconnect().finally(() => process.exit(1));
+  await db.$disconnect().catch(() => {});
+  process.exit(1);
 }
 
 process.on('unhandledRejection', (reason) => shutdown('Promesse non gérée', reason));
 process.on('uncaughtException', (err) => shutdown('Exception non capturée', err));
+
+(async () => {
+  await connectDB();
+  await client.start();
+})();
