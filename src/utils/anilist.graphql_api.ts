@@ -119,7 +119,7 @@ export async function searchAniList(
     throw new Error(`AniList GraphQL error : ${json.errors[0]!.message}`);
   }
 
-  const results = json.data.Page.media.slice(0, PER_PAGE);
+  const results = json.data.Page.media;
 
   return {
     results,
