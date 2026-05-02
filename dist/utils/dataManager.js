@@ -23,7 +23,7 @@ export const DataManager = {
                     user: userId,
                     mal_username: profiles.mal ?? null,
                     al_username: profiles.al ?? null,
-                    mangacollec: profiles.mc ?? null
+                    mangacollec: profiles.mc ?? null,
                 }
             });
         }
