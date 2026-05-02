@@ -16,7 +16,7 @@ export class ExtendedClient extends Client {
     super(options);
   }
 
-  async start() {
+  async start(): Promise<void> {
     await this.loadCommands();
     await this.loadEvents();
     
@@ -50,7 +50,7 @@ export class ExtendedClient extends Client {
     return modules;
   }
 
-  public async loadCommands() {
+  public async loadCommands(): Promise<void> {
     const commands = await this.loadModules<Command>(join(__dirname, '../commands'));
 
     for (const command of commands) {
