@@ -33,7 +33,7 @@ function writeToFile(level: string, message: string, error?: unknown, time?: str
   if (error) logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
 
   appendFile(join(logsDir, `${d}.log`), logMessage, 'utf8', (err) => {
-    if (err) console.error('Échec d\'écriture du fichier :', err);
+    if (err) console.error('[LOGGER] Échec d\'écriture du fichier :', err);
   });
 }
 
