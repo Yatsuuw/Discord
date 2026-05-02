@@ -45,7 +45,11 @@ function formatDate(date) {
     const month = MONTHS_FR[date.month - 1];
     return date.day ? `${date.day} ${month} ${date.year}` : `${month} ${date.year}`;
 }
-export function buildResultEmbed(media, index, count) {
+function footer(text, iconURL) {
+    const t = 'Tsuyomi • ' + text;
+    return iconURL ? { text: t, iconURL } : { text: t };
+}
+export function buildResultEmbed(media, index, count, iconURL) {
     const title = media.title.english ?? media.title.romaji ?? media.title.native;
     const description = media.description
         ? truncate(stripHtml(media.description), 300)
@@ -100,16 +104,16 @@ export function buildResultEmbed(media, index, count) {
         .setDescription(description)
         .setThumbnail(media.coverImage.extraLarge)
         .addFields(fields)
-        .setFooter({ text: `Résultat ${index}/${count} · AniList` })
+        .setFooter(footer(`Résultat ${index}/${count} · AniList`, iconURL))
         .setTimestamp();
 }
-export function buildNoResultEmbed(search, type) {
+export function buildNoResultEmbed(search, type, iconURL) {
     const label = type === 'ANIME' ? 'animé' : 'manga';
     return new EmbedBuilder()
         .setColor(Colors.Red)
         .setTitle('❌ Aucun résultat')
         .setDescription(`Aucun ${label} trouvé pour **${search}**.`)
-        .setFooter({ text: 'AniList' })
+        .setFooter(footer('AniList', iconURL))
         .setTimestamp();
 }
 //# sourceMappingURL=embeds.js.map

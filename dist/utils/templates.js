@@ -1,6 +1,7 @@
 import { EmbedBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
-function footer(text = 'Tsuyomi', iconURL) {
-    return iconURL ? { text, iconURL } : { text };
+function footer(text = '', iconURL) {
+    const t = text ? `Tsuyomi • ${text}` : 'Tsuyomi';
+    return iconURL ? { text: t, iconURL } : { text: t };
 }
 export const Templates = {
     success: (content, footerText, iconURL) => new EmbedBuilder()

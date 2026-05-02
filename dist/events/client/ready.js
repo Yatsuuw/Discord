@@ -4,8 +4,9 @@ const PRESENCE_REFRESH_MS = 4 * 60 * 100;
 function setPresence(client) {
     client.user?.setPresence({
         activities: [{
-                name: 'Regarde Laid Back Camp saison 4',
+                name: 'Regarde Laid Back Camp saison 3',
                 type: ActivityType.Watching,
+                url: 'https://www.crunchyroll.com/fr/series/GRWEW95KR/laid-back-camp'
             }],
         status: 'online',
     });
