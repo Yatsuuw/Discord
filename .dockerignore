@@ -1,17 +1,15 @@
 node_modules/
-src/
-dist/
+
 logs/
+
 .env
 .env.*
+
 .vscode/
 .github/
-eslint.config.*
-.prettierrc*
+docker/
 
-__test__/
-*.test.ts
-*.spec.ts
+eslint.config.*
 
 .git/
 .gitignore
