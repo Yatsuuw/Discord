@@ -84,6 +84,8 @@ pnpm db:gen
 │   ├── config.ts         # Configuration centrale du bot
 │   ├── deploy.ts         # Script de déploiement vers l'API Discord
 │   └── index.ts          # Point d'entrée de l'application
+├── .dockerignore         # Fichiers et répertoires ignorés lors de la compilation en image Docker
+├── .env.example          # Fichier d'exemple avec les variables d'environnement nécessaires au robot à compléter
 ├── .gitignore            # Fichiers et répertoires ignorés lors du déploiement
 ├── .npmrc                # Configuration du gestionnaire de paquets, rendre accessible Prisma à la racine de node_modules
 ├── docker-compose.yml    # Création du conteneur Docker
