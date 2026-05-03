@@ -14,13 +14,12 @@ async function deploy() {
             ? Routes.applicationCommands(config.clientId)
             : Routes.applicationGuildCommands(config.clientId, config.guildId);
         await rest.put(route, { body: commandData });
-        logger.info(`Commandes ${isGlobal ? 'globales' : 'locales'} déployées avec succès.`);
+        logger.info(`${commandData.length} commandes ${isGlobal ? 'globales' : 'locales'} déployées avec succès.`);
     }
     catch (error) {
         logger.error('Erreur lors du déploiement des commandes :', error);
         process.exitCode = 1;
     }
 }
-;
 deploy();
 //# sourceMappingURL=deploy.js.map

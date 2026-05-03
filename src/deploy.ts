@@ -26,6 +26,6 @@ async function deploy(): Promise<void> {
     logger.error('Erreur lors du déploiement des commandes :', error);
     process.exitCode = 1;
   }
-};
+}
 
 deploy();
