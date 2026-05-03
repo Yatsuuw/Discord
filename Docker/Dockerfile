@@ -21,16 +21,19 @@ ENV DATABASE_URL=""
 
 RUN pnpm build
 
-RUN pnpm install --frozen-lockfile --prod --node-linker=hoisted --ignore-scripts \
+RUN mkdir /prod_modules \
+  && cp package.json pnpm-lock.yaml .npmrc /prod_modules/ \
+  && cd /prod_modules \
+  && pnpm install --frozen-lockfile --prod --ignore-scripts \
   && pnpm store prune
 
 FROM dhi.io/node:22 AS runner
 
 WORKDIR /app
 
-COPY --from=builder /build/dist/         ./dist/
-COPY --from=builder /build/node_modules/ ./node_modules/
-COPY --from=builder /build/package.json  ./package.json
+COPY --from=builder /build/dist/              ./dist/
+COPY --from=builder /prod_modules/node_modules/ ./node_modules/
+COPY --from=builder /build/package.json       ./package.json
 
 LABEL org.opencontainers.image.title="Tsuyomi Discord Bot" \
   org.opencontainers.image.description="Bot Discord TypeScript — AniList / MAL / MangaCollec" \
