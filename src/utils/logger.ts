@@ -1,15 +1,26 @@
-import { appendFileSync, mkdirSync } from 'node:fs';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { appendFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const logsDir = join(__dirname, '../../logs');
+const logsDir = join(process.cwd(), 'logs');
 
-try {
-  mkdirSync(logsDir, { recursive: true });
-} catch (error) {
-  console.error('[LOGGER] Impossible de créer le dossier de logs.', error);
+function getLogFilePath(): string {
+  const day = timestamp().day;
+  return join(logsDir, `${day}.log`);
 }
+
+function ensureLogFile(): void {
+  try {
+    mkdirSync(logsDir, { recursive: true });
+    const filePath = getLogFilePath();
+    if (!existsSync(filePath)) {
+      writeFileSync(filePath, '', 'utf8');
+    }
+  } catch (error) {
+    console.error('[LOGGER] Impossible de créer le fichier de logs.', error);
+  }
+}
+
+ensureLogFile();
 
 const Colors = {
   Reset: "\x1b[0m",
@@ -21,7 +32,12 @@ const Colors = {
 
 function timestamp() {
   const d = new Date();
-  const day = d.toISOString().slice(0, 10);
+  const day = d.toLocaleDateString('fr-FR', {
+    timeZone: 'Europe/Paris',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).split('/').reverse().join('-');
 
   const time = d.toLocaleTimeString('fr-FR', {
     timeZone: 'Europe/Paris',
@@ -32,13 +48,13 @@ function timestamp() {
 }
 
 function writeToFile(level: string, message: string, error?: unknown): void {
-  const { day, time } = timestamp();
+  const { time } = timestamp();
 
   let logMessage = `[${time}] [${level}] ${message}\n`;
   if (error) logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
 
   try {
-    appendFileSync(join(logsDir, `${day}.log`), logMessage, 'utf8');
+    appendFileSync(getLogFilePath(), logMessage, 'utf8');
   } catch (error) {
     console.error('[LOGGER] Échec de l\'écriture dans le fichier :', error);
   }

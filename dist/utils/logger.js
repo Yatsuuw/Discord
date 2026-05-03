@@ -1,14 +1,23 @@
-import { appendFileSync, mkdirSync } from 'node:fs';
-import { join, dirname } from 'node:path';
-import { fileURLToPath } from 'node:url';
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const logsDir = join(__dirname, '../../logs');
-try {
-    mkdirSync(logsDir, { recursive: true });
+import { appendFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { join } from 'node:path';
+const logsDir = join(process.cwd(), 'logs');
+function getLogFilePath() {
+    const day = timestamp().day;
+    return join(logsDir, `${day}.log`);
 }
-catch (error) {
-    console.error('[LOGGER] Impossible de créer le dossier de logs.', error);
+function ensureLogFile() {
+    try {
+        mkdirSync(logsDir, { recursive: true });
+        const filePath = getLogFilePath();
+        if (!existsSync(filePath)) {
+            writeFileSync(filePath, '', 'utf8');
+        }
+    }
+    catch (error) {
+        console.error('[LOGGER] Impossible de créer le fichier de logs.', error);
+    }
 }
+ensureLogFile();
 const Colors = {
     Reset: "\x1b[0m",
     Red: "\x1b[31m",
@@ -18,7 +27,12 @@ const Colors = {
 };
 function timestamp() {
     const d = new Date();
-    const day = d.toISOString().slice(0, 10);
+    const day = d.toLocaleDateString('fr-FR', {
+        timeZone: 'Europe/Paris',
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+    }).split('/').reverse().join('-');
     const time = d.toLocaleTimeString('fr-FR', {
         timeZone: 'Europe/Paris',
         hour12: false,
@@ -26,12 +40,12 @@ function timestamp() {
     return { day, time };
 }
 function writeToFile(level, message, error) {
-    const { day, time } = timestamp();
+    const { time } = timestamp();
     let logMessage = `[${time}] [${level}] ${message}\n`;
     if (error)
         logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
     try {
-        appendFileSync(join(logsDir, `${day}.log`), logMessage, 'utf8');
+        appendFileSync(getLogFilePath(), logMessage, 'utf8');
     }
     catch (error) {
         console.error('[LOGGER] Échec de l\'écriture dans le fichier :', error);
