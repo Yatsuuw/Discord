@@ -4,6 +4,7 @@ import { Templates } from '../../utils/templates.js';
 import type { Command } from '../../types/index.js';
 import { SITE_CONFIG } from '../../utils/siteConfig.js';
 import { logger } from '../../utils/logger.js';
+import { assertGuildInitialized } from '../../utils/guildGuard.js';
 
 const command: Command = {
   data: new SlashCommandBuilder()
@@ -30,18 +31,7 @@ const command: Command = {
     const site = interaction.options.getString('site', true);
     const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
 
-    if (interaction.guild) {
-      const { id: guildId, ownerId } = interaction.guild;
-      const existing = await DataManager.getServer(guildId, ownerId);
-
-      if (!existing) {
-        await interaction.reply({
-          embeds: [Templates.error(`Le serveur doit être initialisé dans la base de données pour pouvoir exécuter une commande.`)],
-          flags: MessageFlags.Ephemeral
-        });
-        return;
-      }
-    }
+    if (!await assertGuildInitialized(interaction)) return;
 
     let userData;
     try {

@@ -1,9 +1,9 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags, SlashCommandBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
 import type { Command } from '../../types/index.js';
 import { searchAniList, buildResultEmbed, buildNoResultEmbed, type MediaType } from '../../utils/anilist/index.js';
 import { Templates } from '../../utils/templates.js';
 import { logger } from '../../utils/logger.js';
-import { DataManager } from '../../utils/dataManager.js';
+import { assertGuildInitialized } from '../../utils/guildGuard.js';
 
 const COLLECTOR_TIMEOUT = 120_000;
 
@@ -51,18 +51,7 @@ const command: Command = {
     const search = interaction.options.getString('nom',  true).trim();
     const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
 
-    if (interaction.guild) {
-      const { id: guildId, ownerId } = interaction.guild;
-      const existing = await DataManager.getServer(guildId, ownerId);
-
-      if (!existing) {
-        await interaction.reply({
-          embeds: [Templates.error(`Le serveur doit être initialisé dans la base de données pour pouvoir exécuter une commande.`)],
-          flags: MessageFlags.Ephemeral
-        });
-        return;
-      }
-    }
+    if (!await assertGuildInitialized(interaction)) return;
 
     await interaction.deferReply();
 
