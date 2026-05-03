@@ -34,19 +34,26 @@ export class ExtendedClient extends Client {
     const modules: T[] = [];
     const categories = readdirSync(basePath);
 
-    for (const category of categories) {
-      const categoryPath = join(basePath, category);
-      if (!statSync(categoryPath).isDirectory()) continue;
+    await Promise.all(
+      categories.map(async (category) => {
+        const categoryPath = join(basePath, category);
+        if (!statSync(categoryPath).isDirectory()) return;
 
-      const files = readdirSync(categoryPath).filter(f => f.endsWith('.js') && !f.endsWith('.d.js'));
+        const files = readdirSync(categoryPath).filter(f => f.endsWith('.js') && !f.endsWith('.d.js'));
 
-      for (const file of files) {
-        const filePath = pathToFileURL(join(categoryPath, file)).href;
-        const mod = (await import(filePath)).default as T | undefined;
-        if (mod) modules.push(mod);
-        else logger.warn(`⚠️ Module ignoré (export default manquant) : ${file}`);
-      }
-    }
+        const loaded = await Promise.all(
+          files.map(async (file) => {
+            const filePath = pathToFileURL(join(categoryPath, file)).href;
+            const mod = (await import(filePath)).default as T | undefined;
+
+            if (!mod) logger.warn(`⚠️ Module ignoré (export default manquant) : ${file}`);
+            return mod;
+          })
+        );
+
+        modules.push(...(loaded.filter(Boolean) as T[]));
+      })
+    )
     return modules;
   }
 
