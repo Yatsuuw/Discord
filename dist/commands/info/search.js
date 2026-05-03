@@ -1,7 +1,8 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, MessageFlags, SlashCommandBuilder } from 'discord.js';
 import { searchAniList, buildResultEmbed, buildNoResultEmbed } from '../../utils/anilist/index.js';
 import { Templates } from '../../utils/templates.js';
 import { logger } from '../../utils/logger.js';
+import { DataManager } from '../../utils/dataManager.js';
 const COLLECTOR_TIMEOUT = 120_000;
 function buildActionRow(disabled = false) {
     return new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Valider').setStyle(ButtonStyle.Success).setDisabled(disabled), new ButtonBuilder().setCustomId('delete').setEmoji('🗑️').setLabel('Supprimer').setStyle(ButtonStyle.Danger).setDisabled(disabled));
@@ -28,6 +29,17 @@ const command = {
         const type = interaction.options.getString('type', true);
         const search = interaction.options.getString('nom', true).trim();
         const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
+        if (interaction.guild) {
+            const { id: guildId, ownerId } = interaction.guild;
+            const existing = await DataManager.getServer(guildId, ownerId);
+            if (!existing) {
+                await interaction.reply({
+                    embeds: [Templates.error(`Le serveur doit être initialisé dans la base de données pour pouvoir exécuter une commande.`)],
+                    flags: MessageFlags.Ephemeral
+                });
+                return;
+            }
+        }
         await interaction.deferReply();
         let pageData;
         try {

@@ -18,6 +18,17 @@ const command = {
         const target = interaction.options.getUser('membre') ?? interaction.user;
         const site = interaction.options.getString('site', true);
         const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
+        if (interaction.guild) {
+            const { id: guildId, ownerId } = interaction.guild;
+            const existing = await DataManager.getServer(guildId, ownerId);
+            if (!existing) {
+                await interaction.reply({
+                    embeds: [Templates.error(`Le serveur doit être initialisé dans la base de données pour pouvoir exécuter une commande.`)],
+                    flags: MessageFlags.Ephemeral
+                });
+                return;
+            }
+        }
         let userData;
         try {
             userData = await DataManager.getUser(target.id);
