@@ -8,7 +8,7 @@ const event: Event<Events.InteractionCreate> = {
   once: false,
   async execute(client, interaction: Interaction) {
     if (!interaction.isChatInputCommand()) return;
-    const iconURL = interaction.client.user.displayAvatarURL({ size: 32 })
+    const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
 
     const command = client.commands.get(interaction.commandName);
 
