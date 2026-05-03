@@ -37,7 +37,7 @@ const command: Command = {
     try {
       userData = await DataManager.getUser(target.id);
     } catch (error) {
-      logger.error(`Une erreur est survenue lors de la récupération d'un profil.`, error)
+      logger.error(`Une erreur est survenue lors de la récupération d'un profil.`, error);
       await interaction.reply({
         embeds: [Templates.error('Erreur lors de la récupération du profil. Réessaie dans quelques instants.', undefined, iconURL)],
         flags: MessageFlags.Ephemeral,
