@@ -66,7 +66,7 @@ const command: Command = {
       return;
     }
 
-    const url   = siteConfig.buildUrl(profileName);
+    const url = siteConfig.buildUrl(profileName);
     const embed = Templates.info(`${siteConfig.label} - ${target.username}`, [
       { name: 'Lien du profil', value: `[Lien vers la page ${siteConfig.label}](${url})` },
     ], undefined, undefined, iconURL);

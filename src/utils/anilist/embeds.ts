@@ -29,7 +29,7 @@ const MONTHS_FR: Readonly<string[]> = [
 
 const AUTHOR_ROLES = new Set(['Story & Art', 'Story', 'Art']);
 
-const RE_HTML    = /<[^>]*>/g;
+const RE_HTML = /<[^>]*>/g;
 const RE_NEWLINE = /\n{3,}/g;
 
 function stripHtml(text: string): string {
