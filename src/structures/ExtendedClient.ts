@@ -1,5 +1,5 @@
 import { Client, type ClientEvents, type ClientOptions, Collection } from 'discord.js';
-import type { Command, Event } from '../types/index.js'
+import type { Command, Event } from '../types/index.js';
 import { readdirSync, statSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -39,7 +39,7 @@ export class ExtendedClient extends Client {
         const categoryPath = join(basePath, category);
         if (!statSync(categoryPath).isDirectory()) return;
 
-        const files = readdirSync(categoryPath).filter(f => f.endsWith('.js') && !f.endsWith('.d.js'));
+        const files = readdirSync(categoryPath).filter((f) => f.endsWith('.js') && !f.endsWith('.d.js'));
 
         const loaded = await Promise.all(
           files.map(async (file) => {
