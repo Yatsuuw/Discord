@@ -53,7 +53,7 @@ const command = {
         }
         const url = siteConfig.buildUrl(profileName);
         const embed = Templates.info(`${siteConfig.label} - ${target.username}`, [
-            { name: 'Lien du profil', value: `[Lien vers la page ${siteConfig.label}](${url})` },
+            { name: 'Lien du profil', value: `[Lien vers la page ${siteConfig.label} de ${target.globalName}](${url})` },
         ], undefined, undefined, iconURL);
         embed.setThumbnail(target.displayAvatarURL({ size: 512 }));
         await interaction.reply({ embeds: [embed] });
