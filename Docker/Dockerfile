@@ -12,7 +12,12 @@ COPY tsconfig.json prisma.config.ts ./
 COPY prisma/ ./prisma/
 COPY src/ ./src/
 
+ARG DATABASE_URL=mysql://build:build@localhost:3306/build
+ENV DATABASE_URL=${DATABASE_URL}
+
 RUN node ./node_modules/prisma/build/index.js generate
+
+ENV DATABASE_URL=""
 
 RUN pnpm build
 
