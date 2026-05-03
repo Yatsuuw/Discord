@@ -1,0 +1,16 @@
+services:
+  tsuyomi:
+    image: tsuyomi:latest
+    container_name: tsuyomi
+    restart: unless-stopped
+    env_file:
+      - .env
+    volumes:
+      - ./logs:/srv/logs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
