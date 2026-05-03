@@ -31,7 +31,7 @@ const command: Command = {
     const site = interaction.options.getString('site', true);
     const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
 
-    if (!await assertGuildInitialized(interaction)) return;
+    if (!await assertGuildInitialized(interaction, iconURL)) return;
 
     let userData;
     try {

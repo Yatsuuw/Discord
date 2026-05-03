@@ -51,7 +51,7 @@ const command: Command = {
     const search = interaction.options.getString('nom',  true).trim();
     const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
 
-    if (!await assertGuildInitialized(interaction)) return;
+    if (!await assertGuildInitialized(interaction, iconURL)) return;
 
     await interaction.deferReply();
 

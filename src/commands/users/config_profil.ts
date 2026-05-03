@@ -32,7 +32,7 @@ const command: Command = {
     const username = interaction.options.getString('nom', false) ?? null;
     const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
 
-    if (!await assertGuildInitialized(interaction)) return;
+    if (!await assertGuildInitialized(interaction, iconURL)) return;
 
     try {
       await DataManager.upsertUser(userId, { [site]: username });
