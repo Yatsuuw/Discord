@@ -2,7 +2,7 @@ import { REST, Routes } from "discord.js";
 import { ExtendedClient } from "./structures/ExtendedClient.js";
 import { config } from "./config.js";
 import { logger } from "./utils/logger.js";
-const deploy = async () => {
+async function deploy() {
     const isGlobal = process.argv.includes('--global');
     const client = new ExtendedClient({ intents: [] });
     await client.loadCommands();
@@ -20,6 +20,7 @@ const deploy = async () => {
         logger.error('Erreur lors du déploiement des commandes :', error);
         process.exitCode = 1;
     }
-};
+}
+;
 deploy();
 //# sourceMappingURL=deploy.js.map

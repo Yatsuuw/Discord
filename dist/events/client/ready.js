@@ -1,6 +1,7 @@
 import { ActivityType, Events } from "discord.js";
 import { logger } from "../../utils/logger.js";
 const PRESENCE_REFRESH_MS = 4 * 60 * 1_000;
+let presenceInterval = null;
 function setPresence(client) {
     client.user?.setPresence({
         activities: [{
@@ -15,8 +16,10 @@ const event = {
     once: true,
     execute(client, c) {
         logger.info(`${c.user.tag} est connecté.`);
+        if (presenceInterval !== null)
+            clearInterval(presenceInterval);
         setPresence(client);
-        setInterval(() => setPresence(client), PRESENCE_REFRESH_MS);
+        presenceInterval = setInterval(() => setPresence(client), PRESENCE_REFRESH_MS);
     },
 };
 export default event;

@@ -19,13 +19,6 @@ const command = {
         const site = interaction.options.getString('site', true);
         const username = interaction.options.getString('nom', false) ?? null;
         const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
-        if (!['mal', 'al', 'mc'].includes(site)) {
-            await interaction.reply({
-                embeds: [Templates.error('Site inconnu.', undefined, iconURL)],
-                flags: MessageFlags.Ephemeral,
-            });
-            return;
-        }
         try {
             await DataManager.upsertUser(userId, { [site]: username });
             const siteName = SITE_CONFIG[site]?.label ?? site;

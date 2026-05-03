@@ -30,7 +30,7 @@ export class ExtendedClient extends Client {
             const categoryPath = join(basePath, category);
             if (!statSync(categoryPath).isDirectory())
                 return;
-            const files = readdirSync(categoryPath).filter(f => f.endsWith('.js') && !f.endsWith('.d.js'));
+            const files = readdirSync(categoryPath).filter((f) => f.endsWith('.js') && !f.endsWith('.d.js'));
             const loaded = await Promise.all(files.map(async (file) => {
                 const filePath = pathToFileURL(join(categoryPath, file)).href;
                 const mod = (await import(filePath)).default;

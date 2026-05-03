@@ -3,8 +3,8 @@ import { searchAniList, buildResultEmbed, buildNoResultEmbed } from '../../utils
 import { Templates } from '../../utils/templates.js';
 import { logger } from '../../utils/logger.js';
 const COLLECTOR_TIMEOUT = 120_000;
-function buildActionRow() {
-    return new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Valider').setStyle(ButtonStyle.Success), new ButtonBuilder().setCustomId('delete').setEmoji('🗑️').setLabel('Supprimer').setStyle(ButtonStyle.Danger));
+function buildActionRow(disabled = false) {
+    return new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Valider').setStyle(ButtonStyle.Success).setDisabled(disabled), new ButtonBuilder().setCustomId('delete').setEmoji('🗑️').setLabel('Supprimer').setStyle(ButtonStyle.Danger).setDisabled(disabled));
 }
 function buildNavRow(isFirst, isLast) {
     return new ActionRowBuilder().addComponents(new ButtonBuilder().setCustomId('first').setEmoji('⏮️').setStyle(ButtonStyle.Secondary).setDisabled(isFirst), new ButtonBuilder().setCustomId('prev').setEmoji('◀️').setStyle(ButtonStyle.Primary).setDisabled(isFirst), new ButtonBuilder().setCustomId('next').setEmoji('▶️').setStyle(ButtonStyle.Primary).setDisabled(isLast), new ButtonBuilder().setCustomId('last').setEmoji('⏭️').setStyle(ButtonStyle.Secondary).setDisabled(isLast));
@@ -106,7 +106,7 @@ const command = {
         collector.on('end', async (_, reason) => {
             if (reason === 'confirmed' || reason === 'deleted')
                 return;
-            await interaction.editReply({ components: [buildNavRow(true, true)] }).catch(() => { });
+            await interaction.editReply({ components: [buildNavRow(true, true), buildActionRow(true)] }).catch(() => { });
         });
     },
 };
