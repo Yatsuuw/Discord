@@ -1,7 +1,6 @@
 import { REST, Routes } from "discord.js";
 import { ExtendedClient } from "./structures/ExtendedClient.js";
 import { config } from "./config.js";
-import { db } from "./utils/database.js";
 import { logger } from "./utils/logger.js";
 const deploy = async () => {
     const isGlobal = process.argv.includes('--global');
@@ -20,9 +19,6 @@ const deploy = async () => {
     catch (error) {
         logger.error('Erreur lors du déploiement des commandes :', error);
         process.exitCode = 1;
-    }
-    finally {
-        await db.$disconnect();
     }
 };
 deploy();

@@ -3,6 +3,12 @@ import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const logsDir = join(__dirname, '../../logs');
+try {
+    mkdirSync(logsDir, { recursive: true });
+}
+catch (error) {
+    console.error('[LOGGER] Impossible de créer le dossier de logs.', error);
+}
 const Colors = {
     Reset: "\x1b[0m",
     Red: "\x1b[31m",
@@ -25,7 +31,6 @@ function writeToFile(level, message, error) {
     if (error)
         logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
     try {
-        mkdirSync(logsDir, { recursive: true });
         appendFileSync(join(logsDir, `${day}.log`), logMessage, 'utf8');
     }
     catch (error) {
