@@ -1,26 +1,8 @@
-import { appendFileSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { appendFileSync, closeSync, existsSync, mkdirSync, openSync } from 'node:fs';
 import { join } from 'node:path';
 
+const TIMEZONE = 'Europe/Paris';
 const logsDir = join(process.cwd(), 'logs');
-
-function getLogFilePath(): string {
-  const day = timestamp().day;
-  return join(logsDir, `${day}.log`);
-}
-
-function ensureLogFile(): void {
-  try {
-    mkdirSync(logsDir, { recursive: true });
-    const filePath = getLogFilePath();
-    if (!existsSync(filePath)) {
-      writeFileSync(filePath, '', 'utf8');
-    }
-  } catch (error) {
-    console.error('[LOGGER] Impossible de créer le fichier de logs.', error);
-  }
-}
-
-ensureLogFile();
 
 const Colors = {
   Reset: "\x1b[0m",
@@ -30,27 +12,42 @@ const Colors = {
   Blue: "\x1b[34m",
 } as const;
 
-function timestamp() {
-  const d = new Date();
-  const day = d.toLocaleDateString('fr-FR', {
-    timeZone: 'Europe/Paris',
+type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
+
+function getDay(): string {
+  return new Date().toLocaleDateString('fr-FR', {
+    timeZone: TIMEZONE,
     year: 'numeric',
     month: '2-digit',
     day: '2-digit',
   }).split('/').reverse().join('-');
-
-  const time = d.toLocaleTimeString('fr-FR', {
-    timeZone: 'Europe/Paris',
-    hour12: false,
-  });
-
-  return { day, time };
 }
 
-function writeToFile(level: string, message: string, error?: unknown): void {
-  const { time } = timestamp();
+function getTime(): string {
+  return new Date().toLocaleTimeString('fr-FR', {
+    timeZone: TIMEZONE,
+    hour12: false,
+  });
+}
 
-  let logMessage = `[${time}] [${level}] ${message}\n`;
+function getLogFilePath(): string {
+  return join(logsDir, `${getDay()}.log`);
+}
+
+function ensureLogFile(): void {
+  try {
+    mkdirSync(logsDir, { recursive: true });
+    const path = getLogFilePath();
+    if (!existsSync(path)) closeSync(openSync(path, 'a'));
+  } catch (error) {
+    console.error('[LOGGER] Impossible de créer le fichier de logs.', error);
+  }
+}
+
+ensureLogFile();
+
+function writeToFile(level: LogLevel, message: string, error?: unknown): void {
+  let logMessage = `[${getTime()}] [${level}] ${message}\n`;
   if (error) logMessage += `${error instanceof Error ? error.stack : JSON.stringify(error, null, 2)}\n`;
 
   try {
@@ -62,28 +59,24 @@ function writeToFile(level: string, message: string, error?: unknown): void {
 
 export const logger = {
   info: (message: string): void => {
-    const { time } = timestamp();
-    console.log(`${Colors.Green}[INFO]${Colors.Reset} [${time}] ${message}`);
+    console.log(`${Colors.Green}[INFO]${Colors.Reset} [${getTime()}] ${message}`);
     writeToFile('INFO', message);
   },
 
   warn: (message: string): void => {
-    const { time } = timestamp();
-    console.warn(`${Colors.Yellow}[WARN]${Colors.Reset} [${time}] ${message}`);
+    console.warn(`${Colors.Yellow}[WARN]${Colors.Reset} [${getTime()}] ${message}`);
     writeToFile('WARN', message);
   },
 
   error: (message: string, error?: unknown): void => {
-    const { time } = timestamp();
-    console.error(`${Colors.Red}[ERROR]${Colors.Reset} [${time}] ${message}`);
+    console.error(`${Colors.Red}[ERROR]${Colors.Reset} [${getTime()}] ${message}`);
     if (error) console.error(error);
     writeToFile('ERROR', message, error);
   },
 
   debug: (message: string): void => {
     if (process.env.NODE_ENV === 'production') return;
-    const { time } = timestamp();
-    console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${time}] ${message}`);
+    console.debug(`${Colors.Blue}[DEBUG]${Colors.Reset} [${getTime()}] ${message}`);
     writeToFile('DEBUG', message);
   },
 };
