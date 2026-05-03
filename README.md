@@ -45,6 +45,8 @@ pnpm db:gen
 ```text
 .
 ├── dist/                 # Code compilé du robot pour l'exécution en production
+├── Docker/
+│   └── Dockerfile        # Fichier de création de l'image Docker pour le robot
 ├── logs/                 # Répertoire de toutes les logs du robot
 ├── prisma/               # Schéma de la base de données
 │   └── schema.prisma
@@ -84,6 +86,7 @@ pnpm db:gen
 │   └── index.ts          # Point d'entrée de l'application
 ├── .gitignore            # Fichiers et répertoires ignorés lors du déploiement
 ├── .npmrc                # Configuration du gestionnaire de paquets, rendre accessible Prisma à la racine de node_modules
+├── docker-compose.yml    # Création du conteneur Docker
 ├── eslint.config.js      # Configuration ESLint (Flat Config)
 ├── package.json          # Scripts pnpm et dépendances
 ├── pnpm-lock.yaml        # Configuration des versions des paquets et de leur intégrité
