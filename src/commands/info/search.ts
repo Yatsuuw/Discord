@@ -6,10 +6,10 @@ import { logger } from '../../utils/logger.js';
 
 const COLLECTOR_TIMEOUT = 120_000;
 
-function buildActionRow(): ActionRowBuilder<ButtonBuilder> {
+function buildActionRow(disabled = false): ActionRowBuilder<ButtonBuilder> {
   return new ActionRowBuilder<ButtonBuilder>().addComponents(
-    new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Valider').setStyle(ButtonStyle.Success),
-    new ButtonBuilder().setCustomId('delete').setEmoji('🗑️').setLabel('Supprimer').setStyle(ButtonStyle.Danger),
+    new ButtonBuilder().setCustomId('confirm').setEmoji('✅').setLabel('Valider').setStyle(ButtonStyle.Success).setDisabled(disabled),
+    new ButtonBuilder().setCustomId('delete').setEmoji('🗑️').setLabel('Supprimer').setStyle(ButtonStyle.Danger).setDisabled(disabled),
   );
 }
 
@@ -128,7 +128,7 @@ const command: Command = {
 
     collector.on('end', async (_, reason) => {
       if (reason === 'confirmed' || reason === 'deleted') return;
-      await interaction.editReply({ components: [buildNavRow(true, true)] }).catch(() => {});
+      await interaction.editReply({ components: [buildNavRow(true, true), buildActionRow(true)] }).catch(() => {});
     });
   },
 };
