@@ -19,7 +19,7 @@ const command = {
         const target = interaction.options.getUser('membre') ?? interaction.user;
         const site = interaction.options.getString('site', true);
         const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
-        if (!await assertGuildInitialized(interaction))
+        if (!await assertGuildInitialized(interaction, iconURL))
             return;
         let userData;
         try {

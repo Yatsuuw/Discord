@@ -7,10 +7,11 @@ const command = {
         .setDescription('Répond avec Pong !'),
     async execute(interaction) {
         const latency = Math.round(interaction.client.ws.ping);
-        if (!await assertGuildInitialized(interaction))
+        const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
+        if (!await assertGuildInitialized(interaction, iconURL))
             return;
         await interaction.reply({
-            embeds: [Templates.success(`Pong ! 🏓\nLatence : **${latency}ms**`, undefined, interaction.client.user.displayAvatarURL({ size: 32 }))],
+            embeds: [Templates.success(`Pong ! 🏓\nLatence : **${latency}ms**`, undefined, iconURL)],
             flags: MessageFlags.Ephemeral,
         });
     }

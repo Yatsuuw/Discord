@@ -29,7 +29,7 @@ const command = {
         const type = interaction.options.getString('type', true);
         const search = interaction.options.getString('nom', true).trim();
         const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
-        if (!await assertGuildInitialized(interaction))
+        if (!await assertGuildInitialized(interaction, iconURL))
             return;
         await interaction.deferReply();
         let pageData;
