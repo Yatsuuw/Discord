@@ -3,6 +3,7 @@ import { DataManager } from '../../utils/dataManager.js';
 import { Templates } from '../../utils/templates.js';
 import { SITE_CONFIG } from '../../utils/siteConfig.js';
 import { logger } from '../../utils/logger.js';
+import { assertGuildInitialized } from '../../utils/guildGuard.js';
 const command = {
     data: new SlashCommandBuilder()
         .setName('config_profil')
@@ -19,17 +20,8 @@ const command = {
         const site = interaction.options.getString('site', true);
         const username = interaction.options.getString('nom', false) ?? null;
         const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
-        if (interaction.guild) {
-            const { id: guildId, ownerId } = interaction.guild;
-            const existing = await DataManager.getServer(guildId, ownerId);
-            if (!existing) {
-                await interaction.reply({
-                    embeds: [Templates.error(`Le serveur doit être initialisé dans la base de données pour pouvoir exécuter une commande.`)],
-                    flags: MessageFlags.Ephemeral
-                });
-                return;
-            }
-        }
+        if (!await assertGuildInitialized(interaction))
+            return;
         try {
             await DataManager.upsertUser(userId, { [site]: username });
             const siteName = SITE_CONFIG[site]?.label ?? site;
