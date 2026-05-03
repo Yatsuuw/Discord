@@ -31,14 +31,6 @@ const command: Command = {
     const username = interaction.options.getString('nom', false) ?? null;
     const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
 
-    if (!(['mal', 'al', 'mc'] as const).includes(site)) {
-      await interaction.reply({
-        embeds: [Templates.error('Site inconnu.', undefined, iconURL)],
-        flags: MessageFlags.Ephemeral,
-      });
-      return;
-    }
-
     try {
       await DataManager.upsertUser(userId, { [site]: username });
 
