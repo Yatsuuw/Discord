@@ -32,6 +32,8 @@ const command: Command = {
         embeds: [Templates.success(`Le serveur **${name}** a été initialisé dans la base de données avec succès.`, undefined, iconURL)],
         flags: MessageFlags.Ephemeral,
       });
+
+      logger.debug('La commande /init a été exécutée.');
     } catch (error) {
       logger.error(`Erreur init du serveur ${guildId} :`, error);
       await interaction.reply({
