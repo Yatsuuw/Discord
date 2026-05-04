@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
 import type { Command } from "../../types/index.js";
@@ -9,7 +9,7 @@ const command: Command = {
     .setName('init')
     .setDescription('Initialise le serveur dans la base de données')
     .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
-  async execute(interaction: ChatInputCommandInteraction) {
+  async execute(interaction) {
     if (!interaction.guild) return;
 
     const { id: guildId, ownerId, name } = interaction.guild;
@@ -20,7 +20,7 @@ const command: Command = {
 
       if (existing) {
         await interaction.reply({
-          embeds: [Templates.info('Serveur déjà enregistré', [ { name: 'Information', value: `Ce serveur est déjà enregistré dans la base de données.` } ], undefined, undefined, iconURL)],
+          embeds: [Templates.warning('Serveur déjà enregistré', undefined, iconURL)],
           flags: MessageFlags.Ephemeral
         });
         return;
