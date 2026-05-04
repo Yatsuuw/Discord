@@ -6,7 +6,7 @@ type SiteEntry = {
   buildUrl: (username: string) => string;
 }
 
-export const SITE_CONFIG= {
+export const SITE_CONFIG = {
   mal: {
     label:       'MyAnimeList',
     getUsername: u => u.mal_username,
