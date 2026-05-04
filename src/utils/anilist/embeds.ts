@@ -53,7 +53,7 @@ function formatDate(date: AniListDate): string {
   return date.day ? `${date.day} ${month} ${date.year}` : `${month} ${date.year}`;
 }
 
-function footer(text: string, iconURL?: string): { text: string; iconURL: string } | { text: string } {
+function footer(text: string, iconURL?: string): { text: string; iconURL?: string } {
   return { text: 'Tsuyomi • ' + text, ...(iconURL && { iconURL }) };
 }
 
