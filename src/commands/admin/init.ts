@@ -23,7 +23,7 @@ const command: Command = {
           embeds: [Templates.warning('Serveur déjà enregistré', undefined, iconURL)],
           flags: MessageFlags.Ephemeral
         });
-        logger.debug('La commande /init a été exécutée.');
+        logger.info('La commande /init a été exécutée.');
         return;
       }
 
@@ -34,7 +34,7 @@ const command: Command = {
         flags: MessageFlags.Ephemeral,
       });
 
-      logger.debug('La commande /init a été exécutée.');
+      logger.info('La commande /init a été exécutée.');
     } catch (error) {
       logger.error(`Erreur init du serveur ${guildId} :`, error);
       await interaction.reply({
