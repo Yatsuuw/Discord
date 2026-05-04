@@ -11,14 +11,6 @@ const Colors = {
 };
 let _cachedDay = '';
 let _cachedPath = '';
-function getDay() {
-    return new Date().toLocaleDateString('fr-FR', {
-        timeZone: TIMEZONE,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-    }).split('/').reverse().join('-');
-}
 function getTime() {
     return new Date().toLocaleTimeString('fr-FR', {
         timeZone: TIMEZONE,
@@ -26,7 +18,10 @@ function getTime() {
     });
 }
 function getLogFilePath() {
-    const day = getDay();
+    const day = new Date().toLocaleDateString('fr-FR', {
+        timeZone: TIMEZONE,
+        year: 'numeric', month: '2-digit', day: '2-digit',
+    }).split('/').reverse().join('-');
     if (day !== _cachedDay) {
         _cachedDay = day;
         _cachedPath = join(LOGS_DIR, `${day}.log`);

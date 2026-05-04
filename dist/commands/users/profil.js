@@ -41,10 +41,6 @@ const command = {
             return;
         }
         const siteConfig = SITE_CONFIG[site];
-        if (!siteConfig) {
-            logger.warn(`Site inconnu dans /profil : ${site}`);
-            return;
-        }
         const profileName = siteConfig.getUsername(userData);
         if (!profileName) {
             const msg = target.id === interaction.user.id
@@ -53,8 +49,10 @@ const command = {
             await interaction.reply({ embeds: [Templates.error(msg, undefined, iconURL)], flags: MessageFlags.Ephemeral });
             return;
         }
+        const profileUrl = siteConfig.buildUrl(profileName);
+        const displayName = target.globalName ?? target.username;
         const embed = Templates.info(`${siteConfig.label} - ${target.username}`, [
-            { name: 'Lien du profil', value: `[Lien vers la page ${siteConfig.label} de ${target.globalName ?? target.username}](${siteConfig.buildUrl(profileName)})` },
+            { name: 'Lien du profil', value: `[Lien vers la page ${siteConfig.label} de ${displayName}](${profileUrl})` },
         ], undefined, undefined, iconURL);
         embed.setThumbnail(target.displayAvatarURL({ size: 512 }));
         await interaction.reply({ embeds: [embed] });
