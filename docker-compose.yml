@@ -1,6 +1,9 @@
 services:
   tsuyomi:
     image: tsuyomi:latest
+    build:
+      context: .
+      dockerfile: ./Docker/Dockerfile
     container_name: tsuyomi
     restart: unless-stopped
     env_file:
