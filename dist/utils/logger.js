@@ -1,7 +1,7 @@
 import { appendFileSync, closeSync, existsSync, mkdirSync, openSync } from 'node:fs';
 import { join } from 'node:path';
 const TIMEZONE = 'Europe/Paris';
-const logsDir = join(process.cwd(), 'logs');
+const LOGS_DIR = join(process.cwd(), 'logs');
 const Colors = {
     Reset: "\x1b[0m",
     Red: "\x1b[31m",
@@ -9,6 +9,8 @@ const Colors = {
     Yellow: "\x1b[33m",
     Blue: "\x1b[34m",
 };
+let _cachedDay = '';
+let _cachedPath = '';
 function getDay() {
     return new Date().toLocaleDateString('fr-FR', {
         timeZone: TIMEZONE,
@@ -24,20 +26,21 @@ function getTime() {
     });
 }
 function getLogFilePath() {
-    return join(logsDir, `${getDay()}.log`);
-}
-function ensureLogFile() {
-    try {
-        mkdirSync(logsDir, { recursive: true });
-        const path = getLogFilePath();
-        if (!existsSync(path))
-            closeSync(openSync(path, 'a'));
+    const day = getDay();
+    if (day !== _cachedDay) {
+        _cachedDay = day;
+        _cachedPath = join(LOGS_DIR, `${day}.log`);
+        try {
+            mkdirSync(LOGS_DIR, { recursive: true });
+            if (!existsSync(_cachedPath))
+                closeSync(openSync(_cachedPath, 'a'));
+        }
+        catch (error) {
+            console.error('[LOGGER] Impossible de créer le fichier de logs.', error);
+        }
     }
-    catch (error) {
-        console.error('[LOGGER] Impossible de créer le fichier de logs.', error);
-    }
+    return _cachedPath;
 }
-ensureLogFile();
 function writeToFile(level, message, error) {
     let logMessage = `[${getTime()}] [${level}] ${message}\n`;
     if (error)

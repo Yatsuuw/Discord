@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from 'discord.js';
+import { MessageFlags, SlashCommandBuilder } from 'discord.js';
 import { DataManager } from '../../utils/dataManager.js';
 import { Templates } from '../../utils/templates.js';
 import { SITE_CONFIG } from '../../utils/siteConfig.js';
@@ -54,7 +54,7 @@ const command = {
             return;
         }
         const embed = Templates.info(`${siteConfig.label} - ${target.username}`, [
-            { name: 'Lien du profil', value: `[Lien vers la page ${siteConfig.buildUrl(profileName)} de ${target.globalName}](${siteConfig.buildUrl(profileName)})` },
+            { name: 'Lien du profil', value: `[Lien vers la page ${siteConfig.label} de ${target.globalName ?? target.username}](${siteConfig.buildUrl(profileName)})` },
         ], undefined, undefined, iconURL);
         embed.setThumbnail(target.displayAvatarURL({ size: 512 }));
         await interaction.reply({ embeds: [embed] });

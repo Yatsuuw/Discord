@@ -1,14 +1,26 @@
 import { MessageFlags } from "discord.js";
 import { DataManager } from "./dataManager.js";
 import { Templates } from "./templates.js";
+import { logger } from "./logger.js";
 export async function assertGuildInitialized(interaction, iconURL) {
     if (!interaction.guild)
         return true;
     const { id: guildId, ownerId } = interaction.guild;
-    const existing = await DataManager.getServer(guildId, ownerId);
+    let existing;
+    try {
+        existing = await DataManager.getServer(guildId, ownerId);
+    }
+    catch (error) {
+        logger.error(`Erreur de vérification du serveur ${guildId} :`, error);
+        await interaction.reply({
+            embeds: [Templates.error('Erreur de connexion à la base de données. Réessaie dans quelques instants.', undefined, iconURL)],
+            flags: MessageFlags.Ephemeral,
+        });
+        return false;
+    }
     if (!existing) {
         await interaction.reply({
-            embeds: [Templates.error('Le serveur doit être initialisé dans la base de données pour pouvoir exécuter une commande.', undefined, iconURL)],
+            embeds: [Templates.error('Ce serveur doit être initialisé avec `/init` avant de pouvoir utiliser les commandes.', undefined, iconURL)],
             flags: MessageFlags.Ephemeral,
         });
         return false;
