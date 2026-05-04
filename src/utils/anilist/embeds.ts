@@ -54,8 +54,7 @@ function formatDate(date: AniListDate): string {
 }
 
 function footer(text: string, iconURL?: string): { text: string; iconURL: string } | { text: string } {
-  const t = 'Tsuyomi • ' + text;
-  return iconURL ? { text: t, iconURL } : { text: t };
+  return { text: 'Tsuyomi • ' + text, ...(iconURL && { iconURL }) };
 }
 
 type EmbedField = { name: string; value: string; inline: boolean };
