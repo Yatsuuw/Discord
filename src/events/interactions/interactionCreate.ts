@@ -1,15 +1,14 @@
-import { Events, type Interaction, MessageFlags } from "discord.js";
+import { Events, MessageFlags, type InteractionReplyOptions } from "discord.js";
 import type { Event } from "../../types/index.js";
 import { logger } from "../../utils/logger.js";
 import { Templates } from "../../utils/templates.js";
 
 const event: Event<Events.InteractionCreate> = {
   name: Events.InteractionCreate,
-  once: false,
-  async execute(client, interaction: Interaction) {
+  async execute(client, interaction) {
     if (!interaction.isChatInputCommand()) return;
-    const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
 
+    const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
     const command = client.commands.get(interaction.commandName);
 
     if (!command) {
@@ -27,12 +26,12 @@ const event: Event<Events.InteractionCreate> = {
       logger.error(`Erreur lors de l'exécution de /${interaction.commandName}`, error);
 
       const errorEmbed = Templates.error(`Une erreur interne empêche l'exécution de cette commande.`, undefined, iconURL);
+      const payload: InteractionReplyOptions = { embeds: [errorEmbed], flags: MessageFlags.Ephemeral };
 
-      if (interaction.replied || interaction.deferred) {
-        await interaction.followUp({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral }).catch(() => {});
-      } else {
-        await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral }).catch(() => {});
-      }
+      await (interaction.replied || interaction.deferred
+        ? interaction.followUp(payload)
+        : interaction.reply(payload)
+      ).catch(() => {});
     }
   }
 };
