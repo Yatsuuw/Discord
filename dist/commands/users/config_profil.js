@@ -24,7 +24,7 @@ const command = {
             return;
         try {
             await DataManager.upsertUser(userId, { [site]: username });
-            const siteName = SITE_CONFIG[site]?.label ?? site;
+            const siteName = SITE_CONFIG[site].label;
             const action = username === null ? 'supprimé' : 'enregistré';
             await interaction.reply({
                 embeds: [Templates.success(`Votre pseudo **${siteName}** a été ${action} avec succès.`, undefined, iconURL)],
