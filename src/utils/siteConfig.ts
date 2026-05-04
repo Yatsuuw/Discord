@@ -1,10 +1,12 @@
 import type { users } from "../generated/prisma/index.js";
 
-export const SITE_CONFIG: Record<string, {
-  label:       string;
+type SiteEntry = {
+  label: string;
   getUsername: (u: users) => string | null;
-  buildUrl:    (username: string) => string;
-}> = {
+  buildUrl: (username: string) => string;
+}
+
+export const SITE_CONFIG= {
   mal: {
     label:       'MyAnimeList',
     getUsername: u => u.mal_username,
@@ -20,4 +22,6 @@ export const SITE_CONFIG: Record<string, {
     getUsername: u => u.mangacollec,
     buildUrl:    n => `https://www.mangacollec.com/user/${n}/collection`,
   },
-};
+} satisfies Record<string, SiteEntry>;
+
+export type SiteKey = keyof typeof SITE_CONFIG;
