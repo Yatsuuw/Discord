@@ -8,19 +8,19 @@ type SiteEntry = {
 
 export const SITE_CONFIG = {
   mal: {
-    label:       'MyAnimeList',
+    label: 'MyAnimeList',
     getUsername: u => u.mal_username,
-    buildUrl:    n => `https://myanimelist.net/profile/${n}`,
+    buildUrl: n => `https://myanimelist.net/profile/${n}`,
   },
   al: {
-    label:       'AniList',
+    label: 'AniList',
     getUsername: u => u.al_username,
-    buildUrl:    n => `https://anilist.co/user/${n}`,
+    buildUrl: n => `https://anilist.co/user/${n}`,
   },
   mc: {
-    label:       'MangaCollec',
+    label: 'MangaCollec',
     getUsername: u => u.mangacollec,
-    buildUrl:    n => `https://www.mangacollec.com/user/${n}/collection`,
+    buildUrl: n => `https://www.mangacollec.com/user/${n}/collection`,
   },
 } satisfies Record<string, SiteEntry>;
 
