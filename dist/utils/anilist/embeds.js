@@ -46,8 +46,7 @@ function formatDate(date) {
     return date.day ? `${date.day} ${month} ${date.year}` : `${month} ${date.year}`;
 }
 function footer(text, iconURL) {
-    const t = 'Tsuyomi • ' + text;
-    return iconURL ? { text: t, iconURL } : { text: t };
+    return { text: 'Tsuyomi • ' + text, ...(iconURL && { iconURL }) };
 }
 export function buildResultEmbed(media, index, count, iconURL) {
     const title = media.title.english ?? media.title.romaji ?? media.title.native;
