@@ -78,6 +78,7 @@ pnpm db:gen
 |   |   |   └── types.ts
 │   |   ├── database.ts
 │   |   ├── dataManager.ts
+│   |   ├── guildGuard.ts
 │   |   ├── logger.ts
 │   |   ├── siteConfig.ts
 |   |   └── templates.ts
