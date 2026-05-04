@@ -17,15 +17,6 @@ type LogLevel = 'INFO' | 'WARN' | 'ERROR' | 'DEBUG';
 let _cachedDay = '';
 let _cachedPath = '';
 
-function getDay(): string {
-  return new Date().toLocaleDateString('fr-FR', {
-    timeZone: TIMEZONE,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).split('/').reverse().join('-');
-}
-
 function getTime(): string {
   return new Date().toLocaleTimeString('fr-FR', {
     timeZone: TIMEZONE,
@@ -34,7 +25,10 @@ function getTime(): string {
 }
 
 function getLogFilePath(): string {
-  const day = getDay();
+  const day = new Date().toLocaleDateString('fr-FR', {
+    timeZone: TIMEZONE,
+    year: 'numeric', month: '2-digit', day: '2-digit',
+  }).split('/').reverse().join('-');
 
   if (day !== _cachedDay) {
     _cachedDay = day;
