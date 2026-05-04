@@ -19,6 +19,7 @@ const command = {
                     embeds: [Templates.warning('Serveur déjà enregistré', undefined, iconURL)],
                     flags: MessageFlags.Ephemeral
                 });
+                logger.debug('La commande /init a été exécutée.');
                 return;
             }
             await DataManager.registerServer(guildId, ownerId);

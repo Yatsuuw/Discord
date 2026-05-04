@@ -23,6 +23,7 @@ const command: Command = {
           embeds: [Templates.warning('Serveur déjà enregistré', undefined, iconURL)],
           flags: MessageFlags.Ephemeral
         });
+        logger.debug('La commande /init a été exécutée.');
         return;
       }
 
