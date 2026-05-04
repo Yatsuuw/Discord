@@ -37,7 +37,7 @@ const command: Command = {
     try {
       await DataManager.upsertUser(userId, { [site]: username });
 
-      const siteName = SITE_CONFIG[site]?.label ?? site;
+      const siteName = SITE_CONFIG[site].label;
       const action = username === null ? 'supprimé' : 'enregistré';
 
       await interaction.reply({
