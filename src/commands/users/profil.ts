@@ -1,12 +1,10 @@
-import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from 'discord.js';
+import { MessageFlags, SlashCommandBuilder } from 'discord.js';
 import { DataManager } from '../../utils/dataManager.js';
 import { Templates } from '../../utils/templates.js';
 import type { Command } from '../../types/index.js';
-import { SITE_CONFIG } from '../../utils/siteConfig.js';
+import { SITE_CONFIG, type SiteKey } from '../../utils/siteConfig.js';
 import { logger } from '../../utils/logger.js';
 import { assertGuildInitialized } from '../../utils/guildGuard.js';
-
-type SiteKey = keyof typeof SITE_CONFIG;
 
 const command: Command = {
   data: new SlashCommandBuilder()
@@ -28,7 +26,7 @@ const command: Command = {
         .setRequired(false)
     ),
 
-  async execute(interaction: ChatInputCommandInteraction) {
+  async execute(interaction) {
     const target = interaction.options.getUser('membre') ?? interaction.user;
     const site = interaction.options.getString('site', true) as SiteKey;
     const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
@@ -72,7 +70,7 @@ const command: Command = {
     }
 
     const embed = Templates.info(`${siteConfig.label} - ${target.username}`, [
-      { name: 'Lien du profil', value: `[Lien vers la page ${siteConfig.buildUrl(profileName)} de ${target.globalName}](${siteConfig.buildUrl(profileName)})` },
+      { name: 'Lien du profil', value: `[Lien vers la page ${siteConfig.label} de ${target.globalName ?? target.username}](${siteConfig.buildUrl(profileName)})` },
     ], undefined, undefined, iconURL);
 
     embed.setThumbnail(target.displayAvatarURL({ size: 512 }));
