@@ -3,7 +3,6 @@ import { logger } from "../../utils/logger.js";
 import { Templates } from "../../utils/templates.js";
 const event = {
     name: Events.InteractionCreate,
-    once: false,
     async execute(client, interaction) {
         if (!interaction.isChatInputCommand())
             return;
@@ -23,12 +22,10 @@ const event = {
         catch (error) {
             logger.error(`Erreur lors de l'exécution de /${interaction.commandName}`, error);
             const errorEmbed = Templates.error(`Une erreur interne empêche l'exécution de cette commande.`, undefined, iconURL);
-            if (interaction.replied || interaction.deferred) {
-                await interaction.followUp({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral }).catch(() => { });
-            }
-            else {
-                await interaction.reply({ embeds: [errorEmbed], flags: MessageFlags.Ephemeral }).catch(() => { });
-            }
+            const payload = { embeds: [errorEmbed], flags: MessageFlags.Ephemeral };
+            await (interaction.replied || interaction.deferred
+                ? interaction.followUp(payload)
+                : interaction.reply(payload)).catch(() => { });
         }
     }
 };

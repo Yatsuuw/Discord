@@ -1,1 +1,1 @@
-{"version":3,"file":"profil.d.ts","sourceRoot":"","sources":["../../../src/commands/users/profil.ts"],"names":[],"mappings":"AAGA,OAAO,KAAK,EAAE,OAAO,EAAE,MAAM,sBAAsB,CAAC;AAKpD,QAAA,MAAM,OAAO,EAAE,OAqEd,CAAC;AAEF,eAAe,OAAO,CAAC"}
+{"version":3,"file":"profil.d.ts","sourceRoot":"","sources":["../../../src/commands/users/profil.ts"],"names":[],"mappings":"AAGA,OAAO,KAAK,EAAE,OAAO,EAAE,MAAM,sBAAsB,CAAC;AAOpD,QAAA,MAAM,OAAO,EAAE,OAuEd,CAAC;AAEF,eAAe,OAAO,CAAC"}

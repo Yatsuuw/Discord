@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
+import { MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { DataManager } from "../../utils/dataManager.js";
 import { Templates } from "../../utils/templates.js";
 import { logger } from "../../utils/logger.js";
@@ -16,7 +16,7 @@ const command = {
             const existing = await DataManager.getServer(guildId, ownerId);
             if (existing) {
                 await interaction.reply({
-                    embeds: [Templates.info('Serveur déjà enregistré', [{ name: 'Information', value: `Ce serveur est déjà enregistré dans la base de données.` }], undefined, undefined, iconURL)],
+                    embeds: [Templates.warning('Serveur déjà enregistré', undefined, iconURL)],
                     flags: MessageFlags.Ephemeral
                 });
                 return;

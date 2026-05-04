@@ -1,25 +1,24 @@
-import { ActivityType, Events } from "discord.js";
+import { ActivityType, Client, Events } from "discord.js";
 import { logger } from "../../utils/logger.js";
 const PRESENCE_REFRESH_MS = 4 * 60 * 1_000;
 let presenceInterval = null;
-function setPresence(client) {
-    client.user?.setPresence({
-        activities: [{
-                name: 'Regarde Laid Back Camp saison 3',
-                type: ActivityType.Watching,
-            }],
-        status: 'online',
-    });
-}
 const event = {
     name: Events.ClientReady,
     once: true,
-    execute(client, c) {
-        logger.info(`${c.user.tag} est connecté.`);
-        if (presenceInterval !== null)
+    execute(_client, readyClient) {
+        logger.info(`${readyClient.user.tag} est connecté.`);
+        if (presenceInterval !== null) {
             clearInterval(presenceInterval);
-        setPresence(client);
-        presenceInterval = setInterval(() => setPresence(client), PRESENCE_REFRESH_MS);
+            presenceInterval = null;
+        }
+        const setPresence = () => {
+            readyClient.user.setPresence({
+                activities: [{ name: 'Regarde Laid Back Camp saison 3', type: ActivityType.Watching }],
+                status: 'online',
+            });
+        };
+        setPresence();
+        presenceInterval = setInterval(setPresence, PRESENCE_REFRESH_MS);
     },
 };
 export default event;
