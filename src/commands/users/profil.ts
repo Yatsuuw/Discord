@@ -6,6 +6,8 @@ import { SITE_CONFIG } from '../../utils/siteConfig.js';
 import { logger } from '../../utils/logger.js';
 import { assertGuildInitialized } from '../../utils/guildGuard.js';
 
+type SiteKey = keyof typeof SITE_CONFIG;
+
 const command: Command = {
   data: new SlashCommandBuilder()
     .setName('profil')
@@ -28,7 +30,7 @@ const command: Command = {
 
   async execute(interaction: ChatInputCommandInteraction) {
     const target = interaction.options.getUser('membre') ?? interaction.user;
-    const site = interaction.options.getString('site', true);
+    const site = interaction.options.getString('site', true) as SiteKey;
     const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });
 
     if (!await assertGuildInitialized(interaction, iconURL)) return;
@@ -54,7 +56,10 @@ const command: Command = {
     }
 
     const siteConfig = SITE_CONFIG[site];
-    if (!siteConfig) return;
+    if (!siteConfig) {
+      logger.warn(`Site inconnu dans /profil : ${site}`);
+      return;
+    }
 
     const profileName = siteConfig.getUsername(userData);
 
@@ -66,9 +71,8 @@ const command: Command = {
       return;
     }
 
-    const url = siteConfig.buildUrl(profileName);
     const embed = Templates.info(`${siteConfig.label} - ${target.username}`, [
-      { name: 'Lien du profil', value: `[Lien vers la page ${siteConfig.label} de ${target.globalName}](${url})` },
+      { name: 'Lien du profil', value: `[Lien vers la page ${siteConfig.buildUrl(profileName)} de ${target.globalName}](${siteConfig.buildUrl(profileName)})` },
     ], undefined, undefined, iconURL);
 
     embed.setThumbnail(target.displayAvatarURL({ size: 512 }));
