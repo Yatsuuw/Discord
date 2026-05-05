@@ -20,13 +20,13 @@ Un bot Discord haute performance, entièrement typé en **TypeScript**, utilisan
 
 ### 2. Clonage et dépendances
 ```bash
-git clone [https://github.com/votre-pseudo/votre-depot.git](https://github.com/votre-pseudo/votre-depot.git)
-cd votre-depot
+git clone https://github.com/Yatsuuw/Tsuyomi/tree/master
+cd Tsuyomi
 pnpm install
 ```
 
 ### 3. Configuration de l'environnement
-Créez un fichier .env à la racine :
+Renommez le fichier `.env.example` en `.env` et modifiez les informations suivantes :
 ```bash
 DISCORD_TOKEN="votre_token"
 CLIENT_ID="votre_client_id"
