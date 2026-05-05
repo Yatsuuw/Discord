@@ -19,7 +19,6 @@ const command = {
                     embeds: [Templates.warning('Serveur déjà enregistré', undefined, iconURL)],
                     flags: MessageFlags.Ephemeral
                 });
-                logger.info('Logger de test');
                 return;
             }
             await DataManager.registerServer(guildId, ownerId);

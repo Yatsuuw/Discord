@@ -23,7 +23,6 @@ const command: Command = {
           embeds: [Templates.warning('Serveur déjà enregistré', undefined, iconURL)],
           flags: MessageFlags.Ephemeral
         });
-        logger.info('Logger de test');
         return;
       }
 
