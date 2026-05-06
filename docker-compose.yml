@@ -1,6 +1,6 @@
 services:
   tsuyomi:
-    image: yatsuuw/tsuyomi:latest
+    image: yatsuuw/private:tsuyomi
     build:
       context: .
       dockerfile: ./Docker/Dockerfile
