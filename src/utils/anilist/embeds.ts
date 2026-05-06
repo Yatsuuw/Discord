@@ -118,9 +118,9 @@ export function buildResultEmbed(
 
   const titlesLines: string[] = [];
 
-  if (media.title.english) titlesLines.push(`• 🇬🇧 ${media.title.english}`);
-  if (media.title.native) titlesLines.push(`• 🇯🇵 ${media.title.native}`);
-  if (media.title.romaji) titlesLines.push(`• 🇯🇵 ${media.title.romaji}`);
+  if (media.title.english && media.title.english !== title) titlesLines.push(`• 🇬🇧 ${media.title.english}`);
+  if (media.title.native && media.title.native !== title) titlesLines.push(`• 🇯🇵 ${media.title.native}`);
+  if (media.title.romaji && media.title.romaji !== title) titlesLines.push(`• 🇯🇵 ${media.title.romaji}`);
 
   if (titlesLines.length) {
     fields.push({

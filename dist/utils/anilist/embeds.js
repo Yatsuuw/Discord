@@ -97,11 +97,11 @@ export function buildResultEmbed(media, index, count, iconURL) {
         fields.push({ name: '🏷️ Genres', value: media.genres.slice(0, 5).join(', '), inline: false });
     }
     const titlesLines = [];
-    if (media.title.english)
+    if (media.title.english && media.title.english !== title)
         titlesLines.push(`• 🇬🇧 ${media.title.english}`);
-    if (media.title.native)
+    if (media.title.native && media.title.native !== title)
         titlesLines.push(`• 🇯🇵 ${media.title.native}`);
-    if (media.title.romaji)
+    if (media.title.romaji && media.title.romaji !== title)
         titlesLines.push(`• 🇯🇵 ${media.title.romaji}`);
     if (titlesLines.length) {
         fields.push({
