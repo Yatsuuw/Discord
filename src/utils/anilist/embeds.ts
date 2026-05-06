@@ -116,6 +116,22 @@ export function buildResultEmbed(
     fields.push({ name: '🏷️ Genres', value: media.genres.slice(0, 5).join(', '), inline: false });
   }
 
+  if (media.title) {
+    const titlesLines: string[] = [];
+
+    if (media.title.english) titlesLines.push(`• 🇬🇧 ${media.title.english}`);
+    if (media.title.native) titlesLines.push(`• 🇯🇵 ${media.title.native}`);
+    if (media.title.romaji) titlesLines.push(`• 🇯🇵 ${media.title.romaji}`);
+
+    if (titlesLines.length) {
+      fields.push({
+        name: '🔀 Titres alternatifs',
+        value: titlesLines.join('\n'),
+        inline: false,
+      });
+    }
+  }
+
   return new EmbedBuilder()
     .setColor(parseColor(media.coverImage.color))
     .setTitle(truncate(title, 256))
