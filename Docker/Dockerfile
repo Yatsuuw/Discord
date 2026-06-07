@@ -7,29 +7,18 @@ FROM dhi.io/node:22-dev AS builder
 USER root
 WORKDIR /build
 
-# npm est toujours present dans les images Node
-# On installe pnpm globalement via npm, version fixee (packageManager du projet)
 RUN npm install -g pnpm@11.5.2
 
-# Dependances (couche cachee tant que lock/npmrc ne changent pas)
 COPY .npmrc package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
-# onlyBuiltDependencies autorise les postinstall prisma/esbuild
-RUN echo 'onlyBuiltDependencies[]=@prisma/engines' >> .npmrc \
- && echo 'onlyBuiltDependencies[]=esbuild'         >> .npmrc \
- && echo 'onlyBuiltDependencies[]=prisma'           >> .npmrc \
- && pnpm install --frozen-lockfile
-
-# Generation du client Prisma
 COPY prisma/ ./prisma/
 RUN DATABASE_URL="mysql://localhost:3306/db" pnpm exec prisma generate
 
-# Compilation TypeScript
 COPY tsconfig.json prisma.config.ts ./
 COPY src/ ./src/
 RUN pnpm build
 
-# node_modules de production uniquement
 RUN mkdir /prod_modules \
  && cp package.json pnpm-lock.yaml .npmrc /prod_modules/ \
  && cd /prod_modules \
