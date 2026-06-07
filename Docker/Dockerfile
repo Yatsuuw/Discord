@@ -1,4 +1,4 @@
-FROM dhi.io/node:22-dev AS builder
+FROM dhi.io/node:26-alpine-sfw-ent-dev AS builder
 
 USER root
 WORKDIR /build
@@ -28,7 +28,7 @@ RUN mkdir /prod_modules \
  && node node_modules/@prisma/engines/scripts/postinstall.js 2>/dev/null || true
 
 
-FROM dhi.io/node:22 AS runner
+FROM dhi.io/node:26-alpine AS runner
 
 USER node
 WORKDIR /srv
