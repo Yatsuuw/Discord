@@ -1,16 +1,8 @@
-# ============================================================
-# STAGE 1 - Build
-# ============================================================
 FROM dhi.io/node:22-dev AS builder
 
-USER root
 WORKDIR /build
 
-ENV PNPM_HOME="/root/.local/share/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-
-RUN npm install -g pnpm@11.5.2 && \
-    pnpm config set store-dir /root/.pnpm-store
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY package.json pnpm-lock.yaml .npmrc ./
 
@@ -28,10 +20,6 @@ RUN mkdir /prod_modules && \
     cd /prod_modules && \
     pnpm install --frozen-lockfile --prod --ignore-scripts
 
-
-# ============================================================
-# STAGE 2 - Runtime
-# ============================================================
 FROM dhi.io/node:22 AS runner
 
 USER node
@@ -39,13 +27,13 @@ WORKDIR /srv
 
 ENV NODE_ENV=production
 
-COPY --from=builder --chown=node:node /build/dist/                ./dist/
+COPY --from=builder --chown=node:node /build/dist/ ./dist/
 COPY --from=builder --chown=node:node /prod_modules/node_modules/ ./node_modules/
-COPY --from=builder --chown=node:node /build/package.json         ./package.json
+COPY --from=builder --chown=node:node /build/package.json ./package.json
 
 LABEL org.opencontainers.image.title="Tsuyomi Discord Bot" \
-      org.opencontainers.image.description="Bot Discord TypeScript — AniList / MAL / MangaCollec" \
-      org.opencontainers.image.source="https://github.com/Yatsuuw/Tsuyomi" \
-      org.opencontainers.image.licenses="GPL-3.0-only"
+  org.opencontainers.image.description="Bot Discord TypeScript — AniList / MAL / MangaCollec" \
+  org.opencontainers.image.source="https://github.com/Yatsuuw/Discord" \
+  org.opencontainers.image.licenses="GPL-3.0-only"
 
 CMD ["node", "dist/index.js"]
