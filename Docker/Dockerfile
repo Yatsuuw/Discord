@@ -3,17 +3,15 @@
 # ============================================================
 FROM dhi.io/node:22-dev AS builder
 
+USER root
 WORKDIR /build
 
-# Installation de pnpm via corepack (inclus dans node:22)
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable && corepack prepare pnpm@11.5.2 --activate
+RUN corepack enable && corepack prepare pnpm@11.5.2 --activate && chmod +x /pnpm/pnpm
 
 COPY package.json pnpm-lock.yaml .npmrc ./
 
-# --ignore-scripts=false pour autoriser les build scripts (prisma, esbuild)
-# sans passer par la politique onlyBuiltDependencies du lock file
 RUN pnpm install --frozen-lockfile --ignore-scripts=false
 
 COPY prisma/ ./prisma/
