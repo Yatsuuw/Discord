@@ -5,7 +5,8 @@ WORKDIR /build
 
 RUN corepack enable pnpm \
  && corepack prepare pnpm@latest --activate \
- && chmod +x $(which pnpm)
+ && chmod +x /usr/local/bin/pnpm /usr/local/bin/pnpx 2>/dev/null; \
+    chmod +x /usr/bin/pnpm /usr/bin/pnpx 2>/dev/null; true
 
 COPY package.json pnpm-lock.yaml .npmrc ./
 RUN pnpm install --frozen-lockfile
@@ -35,7 +36,7 @@ COPY --from=builder --chown=node:node /prod_modules/node_modules/ ./node_modules
 COPY --from=builder --chown=node:node /build/package.json         ./package.json
 
 LABEL org.opencontainers.image.title="Tsuyomi Discord Bot" \
-      org.opencontainers.image.description="Bot Discord TypeScript — AniList / MAL / MangaCollec" \
+      org.opencontainers.image.description="Bot Discord TypeScript - AniList / MAL / MangaCollec" \
       org.opencontainers.image.source="https://github.com/Yatsuuw/Discord" \
       org.opencontainers.image.licenses="GPL-3.0-only"
 
