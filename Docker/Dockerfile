@@ -10,7 +10,10 @@ WORKDIR /build
 RUN npm install -g pnpm@11.5.2
 
 COPY .npmrc package.json pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+
+# --unsafe-perm autorise les scripts de build (prisma, esbuild)
+# en contournant la politique de securite de pnpm 11 dans le container
+RUN pnpm install --frozen-lockfile --unsafe-perm
 
 COPY prisma/ ./prisma/
 RUN DATABASE_URL="mysql://localhost:3306/db" pnpm exec prisma generate
@@ -22,7 +25,7 @@ RUN pnpm build
 RUN mkdir /prod_modules \
  && cp package.json pnpm-lock.yaml .npmrc /prod_modules/ \
  && cd /prod_modules \
- && pnpm install --frozen-lockfile --prod
+ && pnpm install --frozen-lockfile --prod --unsafe-perm
 
 
 # ============================================================
