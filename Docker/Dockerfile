@@ -1,6 +1,5 @@
 # ============================================================
 # STAGE 1 - Build
-# dhi.io/node:22-dev : image hardened avec outils de build
 # ============================================================
 FROM dhi.io/node:22-dev AS builder
 
@@ -11,9 +10,10 @@ RUN npm install -g pnpm@11.5.2
 
 COPY .npmrc package.json pnpm-lock.yaml ./
 
-# --unsafe-perm autorise les scripts de build (prisma, esbuild)
-# en contournant la politique de securite de pnpm 11 dans le container
-RUN pnpm install --frozen-lockfile --unsafe-perm
+# pnpm 11 requiert que onlyBuiltDependencies soit dans le lock file.
+# On passe la liste en CLI pour contourner le freeze sans modifier le lock.
+RUN pnpm install --frozen-lockfile \
+    --config.onlyBuiltDependencies=@prisma/engines,esbuild,prisma
 
 COPY prisma/ ./prisma/
 RUN DATABASE_URL="mysql://localhost:3306/db" pnpm exec prisma generate
@@ -25,12 +25,12 @@ RUN pnpm build
 RUN mkdir /prod_modules \
  && cp package.json pnpm-lock.yaml .npmrc /prod_modules/ \
  && cd /prod_modules \
- && pnpm install --frozen-lockfile --prod --unsafe-perm
+ && pnpm install --frozen-lockfile --prod \
+    --config.onlyBuiltDependencies=@prisma/engines,esbuild,prisma
 
 
 # ============================================================
 # STAGE 2 - Runtime
-# dhi.io/node:22 : image hardened minimale
 # ============================================================
 FROM dhi.io/node:22 AS runner
 
