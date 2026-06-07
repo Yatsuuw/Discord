@@ -3,8 +3,9 @@ FROM dhi.io/node:22-dev AS builder
 USER root
 WORKDIR /build
 
-# Active pnpm via corepack (inclus dans Node 22, pas besoin de npm install)
-RUN corepack enable pnpm && corepack prepare pnpm@latest --activate
+RUN corepack enable pnpm \
+ && corepack prepare pnpm@latest --activate \
+ && chmod +x $(which pnpm)
 
 COPY package.json pnpm-lock.yaml .npmrc ./
 RUN pnpm install --frozen-lockfile
