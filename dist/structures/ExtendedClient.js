@@ -26,7 +26,7 @@ export class ExtendedClient extends Client {
         const entries = readdirSync(basePath, { withFileTypes: true });
         const promises = entries.filter((e) => e.isDirectory()).flatMap((dir) => {
             const dirPath = join(basePath, dir.name);
-            return readdirSync(dirPath).filter((f) => f.endsWith('.js') && !f.endsWith('.d.js')).map(async (file) => {
+            return readdirSync(dirPath).filter((f) => (f.endsWith('.ts') || f.endsWith('.js')) && !f.endsWith('.d.ts') && !f.endsWith('.d.js')).map(async (file) => {
                 const url = pathToFileURL(join(dirPath, file)).href;
                 const mod = (await import(url)).default;
                 if (!mod)

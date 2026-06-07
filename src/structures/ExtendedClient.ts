@@ -34,7 +34,7 @@ export class ExtendedClient extends Client {
     const promises = entries.filter((e) => e.isDirectory()).flatMap((dir) => {
       const dirPath = join(basePath, dir.name);
 
-      return readdirSync(dirPath).filter((f) => f.endsWith('.js') && !f.endsWith('.d.js')).map(async (file): Promise<T | undefined> => {
+      return readdirSync(dirPath).filter((f) => (f.endsWith('.ts') || f.endsWith('.js')) && !f.endsWith('.d.ts') && !f.endsWith('.d.js')).map(async (file): Promise<T | undefined> => {
         const url = pathToFileURL(join(dirPath, file)).href;
         const mod = ((await import(url)).default as T | undefined) as T | undefined;
         if (!mod) logger.warn(`⚠️ Module ignoré (export default manquant) : ${file}`);
