@@ -1,8 +1,15 @@
-FROM dhi.io/node:22-dev AS builder
+# ============================================================
+# STAGE 1 — Builder
+# ============================================================
+FROM node:22-alpine3.23 AS builder
+
+RUN apk add --no-cache libc6-compat python3 make g++
+
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable && corepack prepare pnpm@11.5.2 --activate
 
 WORKDIR /build
-
-RUN corepack enable && corepack prepare pnpm@latest --activate
 
 COPY package.json pnpm-lock.yaml .npmrc ./
 
@@ -15,25 +22,31 @@ COPY tsconfig.json prisma.config.ts ./
 COPY src/ ./src/
 RUN pnpm build
 
-RUN mkdir /prod_modules && \
-    cp package.json pnpm-lock.yaml .npmrc /prod_modules/ && \
-    cd /prod_modules && \
-    pnpm install --frozen-lockfile --prod --ignore-scripts
+# Dépendances de production uniquement
+RUN pnpm install --frozen-lockfile --prod --ignore-scripts
 
-FROM dhi.io/node:22 AS runner
 
-USER node
-WORKDIR /srv
+# ============================================================
+# STAGE 2 — Runner
+# ============================================================
+FROM node:22-alpine3.23 AS runner
+
+RUN apk add --no-cache libc6-compat
 
 ENV NODE_ENV=production
 
-COPY --from=builder --chown=node:node /build/dist/ ./dist/
-COPY --from=builder --chown=node:node /prod_modules/node_modules/ ./node_modules/
-COPY --from=builder --chown=node:node /build/package.json ./package.json
+RUN addgroup -S tsuyomi && adduser -S tsuyomi -G tsuyomi
+USER tsuyomi
+
+WORKDIR /srv
+
+COPY --from=builder --chown=tsuyomi:tsuyomi /build/dist/           ./dist/
+COPY --from=builder --chown=tsuyomi:tsuyomi /build/node_modules/   ./node_modules/
+COPY --from=builder --chown=tsuyomi:tsuyomi /build/package.json    ./package.json
 
 LABEL org.opencontainers.image.title="Tsuyomi Discord Bot" \
-  org.opencontainers.image.description="Bot Discord TypeScript — AniList / MAL / MangaCollec" \
-  org.opencontainers.image.source="https://github.com/Yatsuuw/Discord" \
-  org.opencontainers.image.licenses="GPL-3.0-only"
+      org.opencontainers.image.description="Bot Discord TypeScript — AniList / MAL / MangaCollec" \
+      org.opencontainers.image.source="https://github.com/Yatsuuw/Tsuyomi" \
+      org.opencontainers.image.licenses="GPL-3.0-only"
 
 CMD ["node", "dist/index.js"]
