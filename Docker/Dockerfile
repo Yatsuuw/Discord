@@ -6,11 +6,15 @@ FROM dhi.io/node:22-dev AS builder
 USER root
 WORKDIR /build
 
-RUN npm install -g pnpm@11.5.2 --ignore-scripts
+ENV PNPM_HOME="/root/.local/share/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+
+RUN npm install -g pnpm@11.5.2 && \
+    pnpm config set store-dir /root/.pnpm-store
 
 COPY package.json pnpm-lock.yaml .npmrc ./
 
-RUN pnpm install --frozen-lockfile --ignore-scripts=false
+RUN pnpm install --frozen-lockfile
 
 COPY prisma/ ./prisma/
 RUN DATABASE_URL="mysql://localhost:3306/db" pnpm exec prisma generate
