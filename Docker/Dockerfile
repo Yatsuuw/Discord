@@ -1,18 +1,13 @@
-FROM dhi.io/node:26-alpine-sfw-ent-dev AS builder
+FROM dhi.io/node:22-dev AS builder
 
 USER root
 WORKDIR /build
 
-RUN npm install -g pnpm@latest
+# Active pnpm via corepack (inclus dans Node 22, pas besoin de npm install)
+RUN corepack enable pnpm && corepack prepare pnpm@latest --activate
 
 COPY package.json pnpm-lock.yaml .npmrc ./
-
-# --ignore-scripts contourne ERR_PNPM_IGNORED_BUILDS
-# Les scripts Prisma et esbuild sont déclenchés manuellement juste après
-RUN pnpm install --frozen-lockfile --ignore-scripts \
- && node node_modules/esbuild/install.js 2>/dev/null || true \
- && node node_modules/@prisma/engines/scripts/postinstall.js 2>/dev/null || true \
- && node node_modules/prisma/scripts/postinstall.js 2>/dev/null || true
+RUN pnpm install --frozen-lockfile
 
 COPY prisma/ ./prisma/
 RUN DATABASE_URL="mysql://localhost:3306/db" pnpm exec prisma generate
@@ -24,11 +19,10 @@ RUN pnpm build
 RUN mkdir /prod_modules \
  && cp package.json pnpm-lock.yaml .npmrc /prod_modules/ \
  && cd /prod_modules \
- && pnpm install --frozen-lockfile --prod --ignore-scripts \
- && node node_modules/@prisma/engines/scripts/postinstall.js 2>/dev/null || true
+ && pnpm install --frozen-lockfile --prod
 
 
-FROM dhi.io/node:26-alpine AS runner
+FROM dhi.io/node:22 AS runner
 
 USER node
 WORKDIR /srv
