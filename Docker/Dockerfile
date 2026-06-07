@@ -7,13 +7,11 @@ FROM dhi.io/node:22-dev AS builder
 USER root
 WORKDIR /build
 
-# Installation de pnpm via son installeur officiel (pas corepack)
-# PNPM_HOME dans /root pour que le binaire soit accessible en root
-ENV PNPM_HOME="/root/.local/share/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN wget -qO- https://get.pnpm.io/install.sh | ENV="/root/.shrc" SHELL="$(command -v sh)" sh -
+# npm est toujours present dans les images Node
+# On installe pnpm globalement via npm, version fixee (packageManager du projet)
+RUN npm install -g pnpm@11.5.2
 
-# Dependances d'abord (couche cachee tant que lock/npmrc ne changent pas)
+# Dependances (couche cachee tant que lock/npmrc ne changent pas)
 COPY .npmrc package.json pnpm-lock.yaml ./
 
 # onlyBuiltDependencies autorise les postinstall prisma/esbuild
