@@ -1,25 +1,12 @@
-# ============================================================
-# STAGE 1 — Builder
-# ============================================================
-FROM node:22-alpine3.23 AS builder
-
-RUN apk add --no-cache libc6-compat python3 make g++
-
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable && corepack prepare pnpm@11.5.2 --activate
+FROM dhi.io/node:22-dev AS builder
 
 WORKDIR /build
 
-COPY package.json pnpm-lock.yaml .npmrc pnpm.json ./
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
-# 1. Installer sans exécuter aucun script
-RUN pnpm install --frozen-lockfile --ignore-scripts
+COPY package.json pnpm-lock.yaml .npmrc ./
 
-# 2. Exécuter manuellement les postinstall des paquets natifs
-RUN node node_modules/@prisma/engines/scripts/postinstall.js || true
-RUN node node_modules/prisma/scripts/postinstall.js || true
-RUN node node_modules/esbuild/install.js || true
+RUN pnpm install --frozen-lockfile
 
 COPY prisma/ ./prisma/
 RUN DATABASE_URL="mysql://localhost:3306/db" pnpm exec prisma generate
@@ -28,33 +15,25 @@ COPY tsconfig.json prisma.config.ts ./
 COPY src/ ./src/
 RUN pnpm build
 
-# Dépendances de production uniquement
-RUN pnpm install --frozen-lockfile --prod --ignore-scripts
-RUN node node_modules/@prisma/engines/scripts/postinstall.js || true
-RUN node node_modules/prisma/scripts/postinstall.js || true
+RUN mkdir /prod_modules && \
+    cp package.json pnpm-lock.yaml .npmrc /prod_modules/ && \
+    cd /prod_modules && \
+    pnpm install --frozen-lockfile --prod --ignore-scripts
 
+FROM dhi.io/node:22 AS runner
 
-# ============================================================
-# STAGE 2 — Runner
-# ============================================================
-FROM node:22-alpine3.23 AS runner
-
-RUN apk add --no-cache libc6-compat
+USER node
+WORKDIR /srv
 
 ENV NODE_ENV=production
 
-RUN addgroup -S tsuyomi && adduser -S tsuyomi -G tsuyomi
-USER tsuyomi
-
-WORKDIR /srv
-
-COPY --from=builder --chown=tsuyomi:tsuyomi /build/dist/           ./dist/
-COPY --from=builder --chown=tsuyomi:tsuyomi /build/node_modules/   ./node_modules/
-COPY --from=builder --chown=tsuyomi:tsuyomi /build/package.json    ./package.json
+COPY --from=builder --chown=node:node /build/dist/ ./dist/
+COPY --from=builder --chown=node:node /prod_modules/node_modules/ ./node_modules/
+COPY --from=builder --chown=node:node /build/package.json ./package.json
 
 LABEL org.opencontainers.image.title="Tsuyomi Discord Bot" \
-      org.opencontainers.image.description="Bot Discord TypeScript — AniList / MAL / MangaCollec" \
-      org.opencontainers.image.source="https://github.com/Yatsuuw/Tsuyomi" \
-      org.opencontainers.image.licenses="GPL-3.0-only"
+  org.opencontainers.image.description="Bot Discord TypeScript — AniList / MAL / MangaCollec" \
+  org.opencontainers.image.source="https://github.com/Yatsuuw/Discord" \
+  org.opencontainers.image.licenses="GPL-3.0-only"
 
 CMD ["node", "dist/index.js"]
