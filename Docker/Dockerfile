@@ -13,7 +13,13 @@ WORKDIR /build
 
 COPY package.json pnpm-lock.yaml .npmrc pnpm.json ./
 
-RUN pnpm install --frozen-lockfile
+# 1. Installer sans exécuter aucun script
+RUN pnpm install --frozen-lockfile --ignore-scripts
+
+# 2. Exécuter manuellement les postinstall des paquets natifs
+RUN node node_modules/@prisma/engines/scripts/postinstall.js || true
+RUN node node_modules/prisma/scripts/postinstall.js || true
+RUN node node_modules/esbuild/install.js || true
 
 COPY prisma/ ./prisma/
 RUN DATABASE_URL="mysql://localhost:3306/db" pnpm exec prisma generate
@@ -24,6 +30,8 @@ RUN pnpm build
 
 # Dépendances de production uniquement
 RUN pnpm install --frozen-lockfile --prod --ignore-scripts
+RUN node node_modules/@prisma/engines/scripts/postinstall.js || true
+RUN node node_modules/prisma/scripts/postinstall.js || true
 
 
 # ============================================================
