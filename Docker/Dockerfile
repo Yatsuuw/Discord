@@ -6,9 +6,7 @@ FROM dhi.io/node:22-dev AS builder
 USER root
 WORKDIR /build
 
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable && corepack prepare pnpm@11.5.2 --activate && chmod +x /pnpm/pnpm
+RUN npm install -g pnpm@11.5.2 --ignore-scripts
 
 COPY package.json pnpm-lock.yaml .npmrc ./
 
