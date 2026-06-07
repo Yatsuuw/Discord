@@ -5,20 +5,28 @@ FROM dhi.io/node:22-dev AS builder
 
 WORKDIR /build
 
-COPY package.json package-lock.json ./
-RUN npm ci
+# Installation de pnpm via corepack (inclus dans node:22)
+ENV PNPM_HOME="/pnpm"
+ENV PATH="$PNPM_HOME:$PATH"
+RUN corepack enable && corepack prepare pnpm@11.5.2 --activate
+
+COPY package.json pnpm-lock.yaml .npmrc ./
+
+# --ignore-scripts=false pour autoriser les build scripts (prisma, esbuild)
+# sans passer par la politique onlyBuiltDependencies du lock file
+RUN pnpm install --frozen-lockfile --ignore-scripts=false
 
 COPY prisma/ ./prisma/
-RUN DATABASE_URL="mysql://localhost:3306/db" npx prisma generate
+RUN DATABASE_URL="mysql://localhost:3306/db" pnpm exec prisma generate
 
 COPY tsconfig.json prisma.config.ts ./
 COPY src/ ./src/
-RUN npm run build
+RUN pnpm build
 
 RUN mkdir /prod_modules && \
-    cp package.json package-lock.json /prod_modules/ && \
+    cp package.json pnpm-lock.yaml .npmrc /prod_modules/ && \
     cd /prod_modules && \
-    npm ci --omit=dev
+    pnpm install --frozen-lockfile --prod --ignore-scripts
 
 
 # ============================================================
