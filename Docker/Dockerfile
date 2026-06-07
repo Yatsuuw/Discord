@@ -6,7 +6,13 @@ WORKDIR /build
 RUN npm install -g pnpm@latest
 
 COPY package.json pnpm-lock.yaml .npmrc ./
-RUN pnpm install --frozen-lockfile --config.onlyBuiltDependencies=@prisma/engines,esbuild,prisma
+
+# --ignore-scripts contourne ERR_PNPM_IGNORED_BUILDS
+# Les scripts Prisma et esbuild sont déclenchés manuellement juste après
+RUN pnpm install --frozen-lockfile --ignore-scripts \
+ && node node_modules/esbuild/install.js 2>/dev/null || true \
+ && node node_modules/@prisma/engines/scripts/postinstall.js 2>/dev/null || true \
+ && node node_modules/prisma/scripts/postinstall.js 2>/dev/null || true
 
 COPY prisma/ ./prisma/
 RUN DATABASE_URL="mysql://localhost:3306/db" pnpm exec prisma generate
@@ -18,7 +24,8 @@ RUN pnpm build
 RUN mkdir /prod_modules \
  && cp package.json pnpm-lock.yaml .npmrc /prod_modules/ \
  && cd /prod_modules \
- && pnpm install --frozen-lockfile --prod --config.onlyBuiltDependencies=@prisma/engines
+ && pnpm install --frozen-lockfile --prod --ignore-scripts \
+ && node node_modules/@prisma/engines/scripts/postinstall.js 2>/dev/null || true
 
 
 FROM dhi.io/node:22 AS runner
