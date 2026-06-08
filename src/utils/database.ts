@@ -2,17 +2,17 @@ import { PrismaMariaDb } from "@prisma/adapter-mariadb";
 import { PrismaClient } from "../generated/prisma/index.js";
 import { logger } from "./logger.js";
 
-const rawUrl = process.env.DATABASE_URL;
-if (!rawUrl) throw new Error('Variable d\'environnement manquante : DATABASE_URL');
-
-const dbUrl = new URL(rawUrl);
+if (!process.env.DB_HOST || !process.env.DB_USER || !process.env.DB_PASSWORD || !process.env.DB_NAME) {
+  logger.error('❌ Configuration de la base de données incomplète. Vérifiez vos variables DB_HOST, DB_USER, DB_PASSWORD, DB_PORT et DB_NAME dans le fichier .env.');
+  process.exit(1);
+}
 
 const adapter = new PrismaMariaDb({
-  host: dbUrl.hostname,
-  port: Number(dbUrl.port) || 3306,
-  user: dbUrl.username,
-  password: dbUrl.password,
-  database: dbUrl.pathname.slice(1),
+  host: process.env.DB_HOST,
+  port: Number(process.env.DB_PORT) || 3306,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   connectionLimit: 10,
   connectTimeout: 5_000,
 });
