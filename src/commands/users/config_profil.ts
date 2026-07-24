@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, MessageFlags, SlashCommandBuilder } from 'discord.js';
+import { ApplicationIntegrationType, ChatInputCommandInteraction, InteractionContextType, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import { DataManager } from '../../utils/dataManager.js';
 import { Templates } from '../../utils/templates.js';
 import { SITE_CONFIG } from '../../utils/siteConfig.js';
@@ -10,6 +10,7 @@ const command: Command = {
   data: new SlashCommandBuilder()
     .setName('config_profil')
     .setDescription('Enregistre ou modifie vos pseudos des différents sites')
+    .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
     .addStringOption(option =>
       option.setName('site')
         .setDescription('Le site sur lequel vous voulez enregistrer votre profil')
@@ -24,7 +25,9 @@ const command: Command = {
       option.setName('nom')
         .setDescription('Votre nom d\'utilisateur sur le site (laisser vide pour supprimer)')
         .setRequired(false)
-    ),
+    )
+    .setIntegrationTypes(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)
+    .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel),
 
   async execute(interaction: ChatInputCommandInteraction) {
     const userId = interaction.user.id;

@@ -1,10 +1,13 @@
-import { MessageFlags, SlashCommandBuilder } from "discord.js";
+import { ApplicationIntegrationType, InteractionContextType, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from "discord.js";
 import { Templates } from "../../utils/templates.js";
 import { assertGuildInitialized } from "../../utils/guildGuard.js";
 const command = {
     data: new SlashCommandBuilder()
         .setName('ping')
-        .setDescription('Répond avec Pong !'),
+        .setDescription('Répond avec Pong !')
+        .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+        .setIntegrationTypes(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel),
     async execute(interaction) {
         const latency = Math.round(interaction.client.ws.ping);
         const iconURL = interaction.client.user.displayAvatarURL({ size: 32 });

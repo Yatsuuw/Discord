@@ -1,4 +1,4 @@
-import { MessageFlags, SlashCommandBuilder } from 'discord.js';
+import { ApplicationIntegrationType, InteractionContextType, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import { DataManager } from '../../utils/dataManager.js';
 import { Templates } from '../../utils/templates.js';
 import type { Command } from '../../types/index.js';
@@ -10,6 +10,7 @@ const command: Command = {
   data: new SlashCommandBuilder()
     .setName('profil')
     .setDescription('Affiche le profil externe d\'un utilisateur')
+    .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
     .addStringOption(option =>
       option.setName('site')
         .setDescription('Le site à consulter')
@@ -24,7 +25,10 @@ const command: Command = {
       option.setName('membre')
         .setDescription('Le membre dont vous voulez voir le profil')
         .setRequired(false)
-    ),
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+    .setIntegrationTypes(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)
+    .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel),
 
   async execute(interaction) {
     const target = interaction.options.getUser('membre') ?? interaction.user;

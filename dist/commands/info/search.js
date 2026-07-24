@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationIntegrationType, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, InteractionContextType, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import { searchAniList, buildResultEmbed, buildNoResultEmbed } from '../../utils/anilist/index.js';
 import { Templates } from '../../utils/templates.js';
 import { logger } from '../../utils/logger.js';
@@ -14,6 +14,7 @@ const command = {
     data: new SlashCommandBuilder()
         .setName('search')
         .setDescription('Recherche un animé ou un manga sur AniList')
+        .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
         .addStringOption(option => option
         .setName('type')
         .setDescription('Type de média à rechercher')
@@ -24,7 +25,9 @@ const command = {
         .setDescription('Nom du titre à rechercher')
         .setRequired(true)
         .setMinLength(2)
-        .setMaxLength(100)),
+        .setMaxLength(100))
+        .setIntegrationTypes(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel),
     async execute(interaction) {
         const type = interaction.options.getString('type', true);
         const search = interaction.options.getString('nom', true).trim();

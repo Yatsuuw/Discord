@@ -1,4 +1,4 @@
-import { MessageFlags, SlashCommandBuilder } from 'discord.js';
+import { ApplicationIntegrationType, InteractionContextType, MessageFlags, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import { DataManager } from '../../utils/dataManager.js';
 import { Templates } from '../../utils/templates.js';
 import { SITE_CONFIG } from '../../utils/siteConfig.js';
@@ -8,13 +8,17 @@ const command = {
     data: new SlashCommandBuilder()
         .setName('profil')
         .setDescription('Affiche le profil externe d\'un utilisateur')
+        .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
         .addStringOption(option => option.setName('site')
         .setDescription('Le site à consulter')
         .setRequired(true)
         .addChoices({ name: 'MyAnimeList', value: 'mal' }, { name: 'AniList', value: 'al' }, { name: 'MangaCollec', value: 'mc' }))
         .addUserOption(option => option.setName('membre')
         .setDescription('Le membre dont vous voulez voir le profil')
-        .setRequired(false)),
+        .setRequired(false))
+        .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
+        .setIntegrationTypes(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)
+        .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel),
     async execute(interaction) {
         const target = interaction.options.getUser('membre') ?? interaction.user;
         const site = interaction.options.getString('site', true);

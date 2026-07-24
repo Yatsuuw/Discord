@@ -1,4 +1,4 @@
-import { ActionRowBuilder, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, SlashCommandBuilder } from 'discord.js';
+import { ActionRowBuilder, ApplicationIntegrationType, ButtonBuilder, ButtonStyle, ChatInputCommandInteraction, ComponentType, InteractionContextType, PermissionFlagsBits, SlashCommandBuilder } from 'discord.js';
 import type { Command } from '../../types/index.js';
 import { searchAniList, buildResultEmbed, buildNoResultEmbed, type MediaType } from '../../utils/anilist/index.js';
 import { Templates } from '../../utils/templates.js';
@@ -27,6 +27,7 @@ const command: Command = {
   data: new SlashCommandBuilder()
     .setName('search')
     .setDescription('Recherche un animé ou un manga sur AniList')
+    .setDefaultMemberPermissions(PermissionFlagsBits.SendMessages)
     .addStringOption(option =>
       option
         .setName('type')
@@ -44,7 +45,9 @@ const command: Command = {
         .setRequired(true)
         .setMinLength(2)
         .setMaxLength(100),
-    ),
+    )
+    .setIntegrationTypes(ApplicationIntegrationType.GuildInstall, ApplicationIntegrationType.UserInstall)
+    .setContexts(InteractionContextType.BotDM, InteractionContextType.Guild, InteractionContextType.PrivateChannel),
 
   async execute(interaction: ChatInputCommandInteraction) {
     const type = interaction.options.getString('type', true) as MediaType;
